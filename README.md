@@ -14,7 +14,7 @@ Any questions contact: ```inacio.joao16@ua.pt```
 
 Run the command ```make``` in the respective folder to compile the source code. To compile the MPI version of FSS, use ```make fss_mpi```. This will generate an executable file in the respective directory. 
 
-To run the algorithm just type ```./name_of_executable args``` in the console. To run the MPI version use ```mpirun -np number_cores name_of_executable args``` . If no CLI arguments are passed, the computations will be done with default parameters. To change the parameters, you have to pass arguments in the following order:
+To run the algorithm just type ```./name_of_executable args``` in the console. To run the MPI version use ```mpirun -np number_cores ./name_of_executable args``` . If no CLI arguments are passed, the computations will be done with default parameters. To change the parameters, you have to pass arguments in the following order:
 
 WL:
   * 1º -> exponent to f_final (```f_final = 1 + pow(10, - agrument)```). The default value is 8.
