@@ -19,7 +19,7 @@ To run the algorithm just type ```./name_of_executable args``` in the console. T
 WL:
   * 1º -> exponent to f_final (```f_final = 1 + pow(10, - agrument)```). The default value is 8.
   * 2º -> flatness parameter. The default is 90. For large simulations 90-95 is a good flatness criteria. 
-  * 3º -> number of the run. Used to numerate multiple runs the simulation in oder to obtain staistis from the method. Default is 0. 
+  * 3º -> number of the run. Used to numerate multiple runs of the simulation in oder to obtain statistics from the method. Default is 0. 
 	
 There are 3 cases for providing arguments to the WL sampling simulation. Just the exponent of f_final, the exponent of f_final and run, respectively, and exponent, run and flatness criteria, in this order.
 
