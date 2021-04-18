@@ -17,13 +17,15 @@ WL:
   * 2º -> flatness parameter. The default is 90. For large simulations 90-95 is a good flatness criteria. 
   * 3º -> number of the run. Used to numerate multiple runs the simulation in oder to obtain staistis from the method. Default is 0. 
 	
-There are 3 cases for providing arguments to the WL sampling simulation. Just the exponent of f_final, the exponent of f_final and run, respectively, and exponent, run and flatness criteria, in this order
+There are 3 cases for providing arguments to the WL sampling simulation. Just the exponent of f_final, the exponent of f_final and run, respectively, and exponent, run and flatness criteria, in this order.
+
 FSS single core:
   * 1º -> exponent of REP (```REP = pow(10, argument)```). The default is 4.
   * 2º -> skip parameter. The default is N_atm. This number is probably fine, unless you would like to compare simulations with different skip values. 
   * 3º -> number of the run. Default if 0.
 	
-There are also 3 cases. Just the REP exponent, the REP exponent and run, and the REP exponent, skip and run, in this order
+There are also 3 cases. Just the REP exponent, the REP exponent and run, and the REP exponent, skip and run, in this order.
+
 FSS MPI:
   * 1º -> exponent of REP. Default is 4.
   * 2º -> exponent shuffle REP, it is computed in the same way as the REP vaule. This number dictates the number of times the spins configuration is shuffled before starting the computation for a given magnetization. Default is the value of REP. A good number maybe 100*REP o 1000*REP. This a very quick step, does not affect the simulation time in any way.
