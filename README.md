@@ -32,7 +32,7 @@ There are also 3 cases. Just the REP exponent, the REP exponent and run, and the
 
 FSS MPI:
   * 1º -> exponent of REP. Default is 4.
-  * 2º -> exponent shuffle REP, it is computed in the same way as the REP vaule. This number dictates the number of times the spins configuration is shuffled before starting the computation for a given magnetization. Default is the value of REP. A good number maybe 100*REP o 1000*REP. This a very quick step, does not affect the simulation time in any way.
+  * 2º -> exponent shuffle REP, it is computed in the same way as the REP vaule. This number dictates the number of times the spins configuration is shuffled before starting the computation for a given magnetization. Default is the value of REP. A good number maybe 100.REP o 1000.REP. This a very quick step, does not affect the simulation time in any way.
   * 3º -> skip. Default if N_atm.
   * 4ª number of the run. Default is 0.
 
