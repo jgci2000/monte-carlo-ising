@@ -6,6 +6,10 @@ Any questions contact: ```inacio.joao16@ua.pt```
  * Wang-Landau
  * Flat Scan Sampling
 
+## Prerequisits
+ * C/C++ compiler, prefrably the GNU compiler. 
+ * MPI libraries and compiler. 
+
 ## Instructions
 
 Run the command ```make``` in the respective folder to compile the source code. To compile the MPI version of FSS, use ```make fss_mpi```. This will generate an executable file in the respective directory. 
