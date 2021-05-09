@@ -20,6 +20,8 @@ First off to change the system size and lattice, you have to open the source fil
 
 Run the command `make` or `make all` to compile the all of the source code. You can also compile just the method you want to run. To do that, just type `make method_model`. Method can be `fss` or `wl`, and the model can be `Ising` or `spinS`.
 
+You can also clean compiled files and results from the simulations. To do that, just type `make clean` in the terminal to erase compiled files or `make method_model` to erase a specific compiled file from a method and model. To clean the results type `make clean_results`.
+
 To run the algorithm just type `./name_of_executable args` in the console. To run the MPI version use `mpirun -np number_cores ./name_of_executable args` . If no command line arguments are passed, the computations will completed with the default parameters. To change the parameters, you have to pass arguments in the following order:
 
 ## Wang-Landau Ising:
