@@ -1,6 +1,8 @@
 *.zip
 *.tar.xf
 *.tar.gz
+*.o
+.DS_Store
 
 # Prerequisites
 *.d
