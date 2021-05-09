@@ -3,6 +3,7 @@
 *.tar.gz
 *.o
 .DS_Store
+*/.DS_Store
 
 # Prerequisites
 *.d
