@@ -11,8 +11,8 @@ Any questions contact: <inacio.joao16@ua.pt>
  * Flat Scan Sampling (C++ and MPI)
 
 ## Prerequisits
- * C/C++ compiler. 
- * MPI libraries and compiler. 
+ * C/C++ compiler (compiler has to support the c++17 standart library). 
+ * MPI libraries and compiler.
 
 # Instructions
 
