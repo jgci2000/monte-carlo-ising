@@ -38,7 +38,7 @@ using std::to_string;
 #define SEED        0
 
 // Size of the Ising Lattice
-#define L_LATTICE   4
+#define L_LATTICE   8
 // LATTICE_NUM -> 1 - SS; 2 - SC; 3 - BCC; 4 - FCC; 5 - HCP; 6 - Hex 
 #define LATTICE_NUM 1
 
