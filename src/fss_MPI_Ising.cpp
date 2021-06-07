@@ -153,10 +153,10 @@ int main(int argc, char **argv)
     int *spins_vector = new int[N_atm];
     int *new_spins_vector = new int[N_atm];
     int *NN_table = new int[N_atm * NN];
-    ld *norm_factor = new ld[NM];
+    ld *log_norm_factor = new ld[NM];
 
     read_NN_talbe(NN_table_file_name, NN_table);
-    read_norm_factor(norm_factor_file_name, norm_factor);
+    read_norm_factor(norm_factor_file_name, log_norm_factor, N_atm);
 
     ld *JDOS_root = new ld[NE * NM];
     int hits_root;
@@ -223,7 +223,7 @@ int main(int argc, char **argv)
                 sum_JDOS += JDOS[i * NM + 1];
 
         for (int i = 0; i < NE; i++)
-            JDOS[i * NM + 1] = JDOS[i * NM + 1] * norm_factor[1] / sum_JDOS;
+            JDOS[i * NM + 1] = JDOS[i * NM + 1] * std::exp(log_norm_factor[1]) / sum_JDOS;
 
         string console_output = t + " | q: " + to_string(0) + "/" + to_string(q_max);
         console_log.push_back(console_output);
@@ -415,7 +415,7 @@ int main(int argc, char **argv)
                     sum_JDOS += JDOS_root[i * NM + q + 1];
 
             for (int i = 0; i < NE; i++)
-                JDOS[i * NM + q + 1] = JDOS_root[i * NM + q + 1] * norm_factor[q + 1] / sum_JDOS;
+                JDOS[i * NM + q + 1] = JDOS_root[i * NM + q + 1] * std::exp(log_norm_factor[q + 1]) / sum_JDOS;
 
             auto q_end = std::chrono::steady_clock::now();
             double q_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (q_end - q_start).count()) * pow(10, -6);
@@ -476,7 +476,7 @@ int main(int argc, char **argv)
     delete[] JDOS, delete[] JDOS_root;
     delete[] hist, delete[] hist_E_selected;
     delete[] spins_vector;
-    delete[] norm_factor, delete[] NN_table;
+    delete[] log_norm_factor, delete[] NN_table;
 
     MPI_Finalize();
 

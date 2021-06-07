@@ -38,7 +38,7 @@ using std::to_string;
 #define SEED        0
 
 // Size of the Ising Lattice
-#define L_LATTICE   32
+#define L_LATTICE   4
 // LATTICE_NUM -> 1 - SS; 2 - SC; 3 - BCC; 4 - FCC; 5 - HCP; 6 - Hex 
 #define LATTICE_NUM 1
 
@@ -120,10 +120,10 @@ int main(int argc, char **argv)
 
     int *spins_vector = new int[N_atm];
     int *NN_table = new int[N_atm * NN];
-    ld *norm_factor = new ld[NM];
+    ld *log_norm_factor = new ld[NM];
     
     read_NN_talbe(NN_table_file_name, NN_table);
-    read_norm_factor(norm_factor_file_name, norm_factor);
+    read_norm_factor(norm_factor_file_name, log_norm_factor, N_atm);
 
     ld *ln_JDOS = new ld[NE * NM];
     ld *JDOS = new ld[NE * NM];
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
         
         for (int i = 0; i < NE; i++)
             if (ln_JDOS[i * NM + q] > 0)
-                JDOS[i * NM + q] = exp(ln_JDOS[i * NM + q] + log(norm_factor[q]) - sum_ln_JDOS);  
+                JDOS[i * NM + q] = exp(ln_JDOS[i * NM + q] + log_norm_factor[q] + log( - sum_ln_JDOS));  
     }
 
     // Stop mesuring time
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
 
     delete[] JDOS, delete[] ln_JDOS, delete[] hist;
     delete[] spins_vector;
-    delete[] NN_table, delete[] norm_factor;
+    delete[] NN_table, delete[] log_norm_factor;
 
     return 0;
 }

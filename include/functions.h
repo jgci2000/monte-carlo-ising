@@ -32,7 +32,7 @@ std::map<int, int> create_map(int, int, int);
 
 void read_NN_talbe(std::string, int *);
 
-void read_norm_factor(std::string, long double *);
+void read_norm_factor(std::string, long double *, int);
 
 system_info get_system(int, int);
 

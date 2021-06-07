@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <climits>
+#include <cmath>
 #include <array>
 #include <vector>
 #include <map>
@@ -156,19 +157,34 @@ void read_NN_talbe(std::string file_name, int *NN_table)
         std::cout << "Unable to open neighbour table file. Invalid lattice size or lattice type." << std::endl;
 }
 
-void read_norm_factor(std::string file_name, long double *norm_factor)
+void read_norm_factor(std::string file_name, long double *norm_factor, int N_atm)
 {
     std::ifstream norm_factor_file(file_name);
     std::string line;
 
-    if (norm_factor_file.is_open()) 
+    if (N_atm <= 1024)
     {
-        for (int i = 0; std::getline(norm_factor_file, line); i++)
-            norm_factor[i] = std::stold(line);
-        norm_factor_file.close();
+        if (norm_factor_file.is_open()) 
+        {
+            for (int i = 0; std::getline(norm_factor_file, line); i++)
+                norm_factor[i] = log(std::stold(line));
+            norm_factor_file.close();
+        }
+        else 
+            std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
     }
-    else 
-        std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
+    else
+    {
+        if (norm_factor_file.is_open()) 
+        {
+            for (int i = 0; std::getline(norm_factor_file, line); i++)
+                norm_factor[i] = std::stold(line);
+            norm_factor_file.close();
+        }
+        else 
+            std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
+    }
+
 }
 
 system_info get_system(int L, int lattice_num)

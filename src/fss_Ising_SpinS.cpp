@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     int *spins_vector = new int[N_atm];
     int *new_spins_vector = new int[N_atm];
     int *NN_table = new int[N_atm * NN];
-    ld *norm_factor = new ld[NM];
+    ld *log_norm_factor = new ld[NM];
     ll *hist;
     ll *hist_E_selected;
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     vector<int> line_size_Npos;
     
     read_NN_talbe(NN_table_file_name, NN_table);
-    read_norm_factor(norm_factor_file_name, norm_factor);
+    read_norm_factor(norm_factor_file_name, log_norm_factor, N_atm);
 
     string line;
     std::ifstream sum_npos_file(Npos_file_name);
@@ -272,7 +272,7 @@ int main(int argc, char **argv)
     }
 
     for (int i = 0; i < NE; i++)
-        JDOS[i * NM + 1] = sum_JDOS_M_spin[i] * norm_factor[1] / sum_sum_JDOS_M_spin;
+        JDOS[i * NM + 1] = sum_JDOS_M_spin[i] * std::exp(log_norm_factor[1]) / sum_sum_JDOS_M_spin;
 
     console_output = t + " | q: " + to_string(0) + "/" + to_string(q_max);
     console_log.push_back(console_output);
@@ -589,7 +589,7 @@ int main(int argc, char **argv)
         }
 
         for (int i = 0; i < NE * line_size_Npos.at(q + 1); i++)
-            JDOS_M_spin[q + 1][i] = JDOS_M_spin[q + 1][i] * norm_factor[q + 1] / sum_sum_JDOS_M_spin;
+            JDOS_M_spin[q + 1][i] = JDOS_M_spin[q + 1][i] * std::exp(log_norm_factor[q + 1]) / sum_sum_JDOS_M_spin;
         
         for (int i = 0; i < NE; i++)
             sum_JDOS_M_spin[i] = 0;
@@ -602,7 +602,7 @@ int main(int argc, char **argv)
         }
 
         for (int i = 0; i < NE; i++)
-            JDOS[i * NM + q + 1] = sum_JDOS_M_spin[i] * norm_factor[q + 1] / sum_sum_JDOS_M_spin;
+            JDOS[i * NM + q + 1] = sum_JDOS_M_spin[i] * std::exp(log_norm_factor[q + 1]) / sum_sum_JDOS_M_spin;
 
         int hits = 0;
         for (int i = 0; i < NE * line_size_Npos.at(q); i++)
@@ -672,7 +672,7 @@ int main(int argc, char **argv)
     delete[] JDOS_M_spin;
     delete[] JDOS, delete[] hist, delete[] hist_E_selected;
     delete[] new_spins_vector, delete[] spins_vector;
-    delete[] NN_table, delete[] norm_factor, delete[] Npos;
+    delete[] NN_table, delete[] log_norm_factor, delete[] Npos;
 
     return 0;
 }
