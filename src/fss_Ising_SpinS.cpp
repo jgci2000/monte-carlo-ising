@@ -22,8 +22,6 @@
 #include "../include/splimix64.h"
 #include "../include/xoshiro256++.h"
 
-// this is a test
-
 using std::cout;
 using std::endl;
 using std::vector;
