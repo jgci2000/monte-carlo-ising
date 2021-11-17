@@ -1,5 +1,5 @@
 //
-// Flat Scan Sampling for the Ising SpinS Model 
+// Flat Scan Sampling for the Ising SpinS Model
 // João Inácio, May 8th, 2021
 //
 // This version is single core
@@ -22,6 +22,8 @@
 #include "../include/splimix64.h"
 #include "../include/xoshiro256++.h"
 
+// this is a test
+
 using std::cout;
 using std::endl;
 using std::vector;
@@ -43,7 +45,7 @@ using std::to_string;
 #define S           (double) 1
 // Size of the Ising Lattice
 #define L_LATTICE   4
-// LATTICE_NUM -> 1 - SS; 2 - SC; 3 - BCC; 4 - FCC; 5 - HCP; 6 - Hex 
+// LATTICE_NUM -> 1 - SS; 2 - SC; 3 - BCC; 4 - FCC; 5 - HCP; 6 - Hex
 #define LATTICE_NUM 1
 
 // Output location
@@ -64,9 +66,9 @@ int main(int argc, char **argv)
     splitmix64_seed(seed);
     for (int i = 0; i < 4; i++)
         s[i] = splitmix64();
-    
+
     // Initialize Ising and set parameters for FSS computations
-    
+
     system_info system = get_system(L_LATTICE, LATTICE_NUM, S);
 
     int L = system.L;
@@ -84,11 +86,11 @@ int main(int argc, char **argv)
 
     map<int, int> energies = create_map(- max_E, max_E, 4);
     map<int, int> magnetizations = create_map(- max_M, max_M, 2);
-    
+
     vector<int> spinZ;
     for (int i = 0; i < SZ; i++)
         spinZ.push_back(- 2 * S + 2 * i);
-    
+
     int q_max = (NM + 1) / 2 - 2;
     if (NM % 2 == 0)
         q_max = NM / 2 - 3;
@@ -122,11 +124,11 @@ int main(int argc, char **argv)
             break;
     }
 
-    string NN_table_file_name = "./neighbour_tables/neighbour_table_" + to_string(dim) + "D_" + 
+    string NN_table_file_name = "./neighbour_tables/neighbour_table_" + to_string(dim) + "D_" +
     lattice + "_" + to_string(NN) + "NN_L" + to_string(L) + ".txt";
     string norm_factor_file_name = "./coefficients/coefficients_" + to_string(N_atm) + "d" + to_string(SZ) + ".txt";
     string Npos_file_name = "./sum_npos/sum_configs_Npos" + std::to_string(SZ) + "_N_atm" + std::to_string(N_atm) + ".txt";
-    string save_file = to_string(run) + "_JDOS_FSS_Ising_SpinS_" + to_string(dim) + "D_" + lattice + "_SZ" + to_string(SZ) + 
+    string save_file = to_string(run) + "_JDOS_FSS_Ising_SpinS_" + to_string(dim) + "D_" + lattice + "_SZ" + to_string(SZ) +
     "_L" + to_string(L) + "_REP_1E" + to_string((int) log10(REP)) + "_skip_" + to_string(skip);
 
     // Initialize vectors and read files
@@ -140,7 +142,7 @@ int main(int argc, char **argv)
 
     int **Npos;
     vector<int> line_size_Npos;
-    
+
     read_NN_talbe(NN_table_file_name, NN_table);
     read_norm_factor(norm_factor_file_name, log_norm_factor, N_atm);
 
@@ -179,15 +181,15 @@ int main(int argc, char **argv)
     for (int i = 0; i < NE * NM; i++)
         JDOS[i] = 0;
     JDOS[0] = 1;
-    
+
     for (int i = 0; i < NM; i++)
         JDOS_M_spin[i] = new ld[line_size_Npos.at(i) * NE];
-    
+
     for (int i = 0; i < NM; i++)
         for (int j = 0; j < NE * line_size_Npos.at(i); j++)
             JDOS_M_spin[i][j] = 0;
     JDOS_M_spin[0][0] = 1;
-    
+
     // Start measuring time
 
     vector<string> console_log;
@@ -198,7 +200,7 @@ int main(int argc, char **argv)
     now = time(0);
     t = ctime(&now); t.pop_back();
 
-    string console_output = "run: " + to_string(run) + " | L: " + to_string(L) + " | REP: " + to_string(REP) + " | skip: " + 
+    string console_output = "run: " + to_string(run) + " | L: " + to_string(L) + " | REP: " + to_string(REP) + " | skip: " +
     to_string(skip) + " | dim: " + to_string(dim) + "D | lattice: " + lattice + " | SZ: " + to_string(SZ);
     console_log.push_back(console_output);
 
@@ -211,7 +213,7 @@ int main(int argc, char **argv)
     // Flat Scan Sampling
     // Scan and Compute JDOS at q = 1
 
-    vector<int> SPM; 
+    vector<int> SPM;
     for (int i = 0; i < N_atm; i++)
         SPM.push_back(0);
 
@@ -227,11 +229,11 @@ int main(int argc, char **argv)
             int E_tmp1 = 0;
             for (int a = 0; a < NN; a++)
                 E_tmp1 += - spinZ[SPM[flip_idx]] * spinZ[SPM[flip_idx]];
-            
+
             int E_tmp2 = 0;
             for (int a = 0; a < NN; a++)
                 E_tmp2 += - spinZ[SPM[flip_idx] + x] * spinZ[SPM[flip_idx]];
-            
+
             int E_tmp3 = - max_E - E_tmp1 + E_tmp2;
             int idx_E_tmp3 = energies[E_tmp3];
 
@@ -242,7 +244,7 @@ int main(int argc, char **argv)
                 for (int j = 0; j < SZ; j++)
                     if (SPM_tmp[i] == j)
                         counter[j]++;
-            
+
             int counter2 = 0;
             int idx_Npos;
             for (idx_Npos = 0; idx_Npos < line_size_Npos.at(x) * SZ; idx_Npos += SZ)
@@ -290,7 +292,7 @@ int main(int argc, char **argv)
 
         for (int i = 0; i < NE * line_size_Npos.at(q); i++)
         {
-            hist[i] = 0; 
+            hist[i] = 0;
             hist_E_selected[i] = 0;
         }
 
@@ -322,16 +324,16 @@ int main(int argc, char **argv)
             int E_new = 0;
             for (int a = 0; a < NN; a++)
                 E_new += - spins_vector[flipped_idx] * spins_vector[NN_table[flipped_idx * NN + a]];
-            
+
             E_config = E_config - E_old + E_new;
         }
-        
+
         vector<int> counter; counter.assign(SZ, 0);
         for (int i = 0; i < N_atm; i++)
             for (int j = 0; j < SZ; j++)
                 if (SPM[i] == j)
                     counter[j]++;
-        
+
         int counter2 = 0;
         int idx_Npos;
         for (idx_Npos = 0; idx_Npos < line_size_Npos.at(q) * SZ; idx_Npos += SZ)
@@ -345,7 +347,7 @@ int main(int argc, char **argv)
             else
                 counter2 = 0;
         }
-        
+
         idx_E_config = energies[E_config];
         int idx_Npos_config = idx_Npos / SZ;
 
@@ -353,7 +355,7 @@ int main(int argc, char **argv)
 
         hist[idx_E_config * line_size_Npos.at(q) + idx_Npos_config]++;
         hist_E_selected[idx_E_config * line_size_Npos.at(q) + idx_Npos_config]++;
-        
+
         // Scan the first config
 
         for (int x = 1; x < SZ; x++)
@@ -385,7 +387,7 @@ int main(int argc, char **argv)
                     for (int j = 0; j < SZ; j++)
                         if (SPM_tmp[i] == j)
                             counter[j]++;
-                
+
                 int counter2 = 0;
                 int idx_Npos;
                 for (idx_Npos = 0; idx_Npos < line_size_Npos.at(q + x) * SZ; idx_Npos += SZ)
@@ -414,7 +416,7 @@ int main(int argc, char **argv)
         while (min_hist(hist_E_selected, NE * line_size_Npos.at(q)) < REP)
         {
             // Get a new random condig at magnetization q
-            
+
             if (!accepted)
             {
                 new_SPM = SPM;
@@ -426,7 +428,7 @@ int main(int argc, char **argv)
             int new_idx_Npos_config = 0;
 
             // Choose a spin to flip
-            
+
             int flipped_idx1 = rand_xoshiro256pp() % N_atm;
 
             int E_old = 0;
@@ -450,9 +452,9 @@ int main(int argc, char **argv)
             new_E_config = E_config - E_old + E_new;
 
             int SPM_dif = SPM_end - SPM_start;
-            
+
             // Choose another one to flip back
-            
+
             vector<int> flip_list;
             for (int i = 0; i < N_atm; i++)
                 if (new_SPM[i] + 1 - SPM_dif >= 1 && new_SPM[i] + 1 - SPM_dif <= SZ)
@@ -477,7 +479,7 @@ int main(int argc, char **argv)
                 for (int j = 0; j < SZ; j++)
                     if (new_SPM[i] == j)
                         counter[j]++;
-            
+
             int counter2 = 0;
             int idx_Npos;
             for (idx_Npos = 0; idx_Npos < line_size_Npos.at(q) * SZ; idx_Npos += SZ)
@@ -491,10 +493,10 @@ int main(int argc, char **argv)
                 else
                     counter2 = 0;
             }
-            
+
             new_idx_Npos_config = idx_Npos / SZ;
             new_idx_E_config = energies[new_E_config];
-            
+
             // Wang Landau criteria
 
             ld ratio = JDOS_M_spin[q][idx_Npos_config * NE + idx_E_config] / JDOS_M_spin[q][new_idx_Npos_config * NE + new_idx_E_config];
@@ -551,7 +553,7 @@ int main(int argc, char **argv)
                             for (int j = 0; j < SZ; j++)
                                 if (SPM_tmp[i] == j)
                                     counter[j]++;
-                        
+
                         int counter2 = 0;
                         int idx_Npos;
                         for (idx_Npos = 0; idx_Npos < line_size_Npos.at(q + x) * SZ; idx_Npos += SZ)
@@ -590,7 +592,7 @@ int main(int argc, char **argv)
 
         for (int i = 0; i < NE * line_size_Npos.at(q + 1); i++)
             JDOS_M_spin[q + 1][i] = JDOS_M_spin[q + 1][i] * std::exp(log_norm_factor[q + 1]) / sum_sum_JDOS_M_spin;
-        
+
         for (int i = 0; i < NE; i++)
             sum_JDOS_M_spin[i] = 0;
         sum_sum_JDOS_M_spin = 0;
@@ -617,13 +619,13 @@ int main(int argc, char **argv)
 
         console_output = t + " | q: " + to_string(q) + "/" + to_string(q_max) + " | q_time: " + to_string(q_time) + "s | E: " + to_string(hits) + " | q_time/E: " + to_string(q_time / hits) + "s";
         string data_line = to_string(q) + " " + to_string(q_max) + " " + to_string(q_time) + " " + to_string(hits) + " " + to_string(q_time / hits);
-        
+
         console_log.push_back(console_output);
         data.push_back(data_line);
 
         cout << console_output << endl;
     }
-    
+
     // Stop mesuring time
 
     auto method_end = std::chrono::steady_clock::now();
@@ -641,16 +643,16 @@ int main(int argc, char **argv)
     fs::create_directories(SAVE_DIR(lattice, L, (int) log10(REP)));
 
     std::ofstream file1((string) SAVE_DIR(lattice, L, (int) log10(REP)) + save_file + ".txt");
-    for (int i = 0; i < NE; i++) 
+    for (int i = 0; i < NE; i++)
     {
-        for (int j = 0; j < NM; j++) 
+        for (int j = 0; j < NM; j++)
             file1 << JDOS[i * NM + j] << " ";
         file1 << "\n";
     }
     file1.close();
 
     std::ofstream file2((string) SAVE_DIR(lattice, L, (int) log10(REP)) + save_file + "_data.txt");
-    file2 << "q q_max q_time hits q_time/hits \n"; 
+    file2 << "q q_max q_time hits q_time/hits \n";
     for (int i = 0; i < data.size(); i++)
         file2 << data[i] << "\n";
     file2 << runtime << "\n";
@@ -660,7 +662,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < console_log.size(); i++)
         file3 << console_log.at(i) << "\n";
     file3.close();
-    
+
     // Deallocate arrays
 
     for (int i = 0; i < line_size_Npos.size(); i++)
