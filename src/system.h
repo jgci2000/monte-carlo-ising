@@ -10,6 +10,8 @@
 #include <iostream>
 #include <stdint.h>
 
+#include "rng.h"
+
 class System {
     public:
         int L;
@@ -38,7 +40,7 @@ class System {
         System(int, int, std::string);
         ~System();
 
-        void init_spins_random(uint64_t (*rand)(void));
+        void init_spins_random(RNG &rng);
         void init_spins_max_M();
 
         int energy();

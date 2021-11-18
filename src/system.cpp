@@ -64,12 +64,9 @@ System::System(int L, int Sz, std::string lattice) {
 
 }
 
-System::System() {
-    
-}
+System::System() {}
 
 System::~System() {
-    std::printf("system dest\n");
     delete[] this->norm_factor;
     delete[] this->NN_table;
     delete[] this->spins_vector;
@@ -82,9 +79,9 @@ void System::init_spins_max_M() {
     }
 }
 
-void System::init_spins_random(uint64_t (*rand)(void)) {
+void System::init_spins_random(RNG &rng) {
     for (int i = 0; i < this->N_atm; ++i) {
-        if (rand() % 2 == 0)
+        if (rng.rand() < 0.5)
             this->spins_vector[i] = 1;
         else
             this->spins_vector[i] = -1;
