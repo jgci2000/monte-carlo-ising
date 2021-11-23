@@ -1,6 +1,8 @@
 
 #include "wl.h"
 
+#include <chrono>
+
 WL::WL(double f_init, double f_final, double flatness, RNG &rng) {
     this->init(f_init, f_final, flatness, rng);
 }
