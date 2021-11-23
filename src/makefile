@@ -1,5 +1,5 @@
 
-test: main_test.cpp system.cpp system.h wl.h wl.cpp 
+test: main_test.cpp system.cpp system.h wl.h wl.cpp rng.h 
 	g++-11 main_test.cpp system.cpp wl.cpp -o test
 
 clean:
