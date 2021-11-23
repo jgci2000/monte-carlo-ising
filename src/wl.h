@@ -6,34 +6,38 @@
 #include <stdint.h>
 
 #include "system.h"
+#include "rng.h"
 
 class WL {
     private:
         double f_init;
         double f_final;
         double flatness;
+        int n_f_vals;
 
-        uint64_t seed;
-
-        
         long long *hist;
         long double *ln_JDOS;
         long long mc_cycle;
+        
+        System *ising_lattice;
+        RNG *rng;
 
-        double *f_vals;
-        int n_f_vals;
+        void init(double, double, double, RNG &);
+        long long min_hist();
+        long double average_hist();
 
-        void init(double, double, double, uint64_t);
+        void normalize_JDOS();
+        bool flat_hist();
 
     public:
-
-        System *ising_lattice;
-
-        WL(double, double, double, uint64_t);
-        WL(double, double, double, uint64_t, System &);
+        WL(double, double, double, RNG &);
+        WL(double, double, double, RNG &, System &);
         ~WL();
 
         void add_lattice(System &);
+        void simulate(long long);
+        
+        
 
 };
 
