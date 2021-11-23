@@ -42,12 +42,12 @@ System::System(int L, int Sz, std::string lattice) {
     this->NM = max_M + 1;
 
     this->energies = this->create_map(- max_E, max_E, 4);
-    this->magnetizations = this->create_map(- max_M, max_M, 2); 
+    this->magnetizations = this->create_map(- max_M, max_M, 2);
 
-    std::string NN_table_file_name = "../neighbour_tables/neighbour_table_" + std::to_string(this->dim) + "D_" + this->lattice + 
+    std::string NN_table_file_name = "../neighbour_tables/neighbour_table_" + std::to_string(this->dim) + "D_" + this->lattice +
     "_" + std::to_string(this->NN) + "NN_L" + std::to_string(this->L) + ".txt";
     std::string norm_factor_file_name = "../coefficients/coefficients_" + std::to_string(this->N_atm) + "d" + std::to_string(this->Sz) + ".txt";
-    
+
     this->norm_factor = new long double[this->NM];
     this->NN_table = new int[this->N_atm * this->NN];
 
@@ -61,7 +61,6 @@ System::System(int L, int Sz, std::string lattice) {
     this->JDOS = new long double[this->NE * this->NM];
     for (int i = 0; i < this->NE * this->NM; ++i)
         this->JDOS[i] = 0;
-
 }
 
 System::System() {}
@@ -77,22 +76,28 @@ void System::init_spins_max_M() {
     for (int i = 0; i < this->N_atm; ++i) {
         this->spins_vector[i] = 1;
     }
+
+    this->E_config = this->energy();
+    this->M_config = this->magnetization();
 }
 
 void System::init_spins_random(RNG &rng) {
     for (int i = 0; i < this->N_atm; ++i) {
-        if (rng.rand() < 0.5)
+        if (rng.rand_uniform() < 0.5)
             this->spins_vector[i] = 1;
         else
             this->spins_vector[i] = -1;
     }
+
+    this->E_config = this->energy();
+    this->M_config = this->magnetization();
 }
 
 int System::energy() {
     int E_config = 0;
     for (int i = 0; i < this->N_atm; ++i) {
         for (int a = 0; a < this->NN; ++a)
-            E_config += - this->spins_vector[i] * 
+            E_config += - this->spins_vector[i] *
             this->spins_vector[this->NN_table[i * this->NN + a]];
     }
     return E_config / 2;
@@ -100,8 +105,16 @@ int System::energy() {
 
 int System::magnetization() {
     int M_config = 0;
-    for (int i = 0; i < this->N_atm; ++i)
+    for (int i = 0; i < this->N_atm; ++i) {
         M_config += spins_vector[i];
+    }
     return M_config;
 }
 
+int System::energy_flip(int site) {
+    int delta_E = 0;
+    for (int a = 0; a < this->NN; ++a) {
+        delta_E += - this->spins_vector[site] * this->spins_vector[this->NN_table[site * this->NN + a]];
+    }
+    return delta_E;
+}

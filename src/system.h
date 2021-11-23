@@ -27,7 +27,7 @@ class System {
         std::map<int, int> energies;
         std::map<int, int> magnetizations;
 
-        int *NN_table; 
+        int *NN_table;
         long double *norm_factor;
 
         int *spins_vector;
@@ -45,6 +45,8 @@ class System {
 
         int energy();
         int magnetization();
+
+        int energy_flip(int);
 
     private:
         std::map<int, int> create_map(int init, int final, int step) {
@@ -95,7 +97,7 @@ class System {
                         this->norm_factor[i] = log(std::stold(line));
                     norm_factor_file.close();
                 }
-                else 
+                else
                     std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
             }
             else {
@@ -104,7 +106,7 @@ class System {
                         this->norm_factor[i] = std::stold(line);
                     norm_factor_file.close();
                 }
-                else 
+                else
                     std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
             }
         }
