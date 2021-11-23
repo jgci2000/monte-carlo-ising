@@ -20,7 +20,7 @@ class RNG {
         }
         ~RNG() {}
 
-        long double rand() {
+        long double rand_uniform() {
             const uint64_t result = this->rotl(this->s[0] + this->s[3], 23) + this->s[0];
             const uint64_t t = this->s[1] << 17;
             this->s[2] ^= this->s[0];
@@ -30,6 +30,18 @@ class RNG {
             this->s[2] ^= t;
             this->s[3] = this->rotl(this->s[3], 45);
             return ((long double) result / (long double) UINT64_MAX);
+        }
+
+        uint64_t rand() {
+            const uint64_t result = this->rotl(this->s[0] + this->s[3], 23) + this->s[0];
+            const uint64_t t = this->s[1] << 17;
+            this->s[2] ^= this->s[0];
+            this->s[3] ^= this->s[1];
+            this->s[1] ^= this->s[2];
+            this->s[0] ^= this->s[3];
+            this->s[2] ^= t;
+            this->s[3] = this->rotl(this->s[3], 45);
+            return result;
         }
 };
 
