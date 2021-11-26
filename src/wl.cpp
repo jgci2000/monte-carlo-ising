@@ -2,6 +2,8 @@
 #include "wl.h"
 
 #include <chrono>
+#include <fstream>
+#include <stdlib.h>
 
 WL::WL(double f_init, double f_final, double flatness, RNG &rng) {
     this->init(f_init, f_final, flatness, rng);
@@ -15,6 +17,8 @@ WL::WL(double f_init, double f_final, double flatness, RNG &rng, System &ising_l
 WL::~WL() {
     delete[] this->ln_JDOS;
     delete[] this->hist;
+    delete[] this->time_iter;
+    delete[] this->steps_iter;
 }
 
 void WL::init(double f_init, double f_final, double flatness, RNG &rng) {
@@ -29,6 +33,11 @@ void WL::init(double f_init, double f_final, double flatness, RNG &rng) {
         n_f_vals++;
         f_init = sqrt(f_init);
     }
+
+    this->time_iter = new double[this->n_f_vals];
+    this->steps_iter = new long long[this->n_f_vals];
+
+    this->run_time = 0;
 }
 
 void WL::add_lattice(System &ising_lattice) {
@@ -44,7 +53,28 @@ void WL::add_lattice(System &ising_lattice) {
     }
 }
 
-void WL::simulate(long long steps) {
+void WL::simulate(long long steps, int run, bool verbose) {
+    std::printf("Initiating Wang-Landau Simulation; run: %d \n", run);
+    time_t now = time(0);
+    std::string t = ctime(&now); t.pop_back();
+    std::printf("    Time: %s \n", t.c_str());
+    if (verbose) {    
+        std::printf("    System:  L: %d | Sz: %d | N_atm: %d | lattice: %s | NN: %d \n",
+            this->ising_lattice->L, 
+            this->ising_lattice->Sz,
+            this->ising_lattice->N_atm,
+            this->ising_lattice->lattice.c_str(), 
+            this->ising_lattice->NN);
+        std::printf("    Simulation Parameters: f_init: %f | f_final: %f | flatness: %f | steps %ld \n",
+            this->f_init, 
+            this->f_final, 
+            this->flatness, 
+            steps);   
+        std::printf("\n");
+    }
+
+    bool take_time = true;
+
     double f = this->f_init;
 
     int idx_E_config = this->ising_lattice->energies[this->ising_lattice->E_config];
@@ -61,12 +91,15 @@ void WL::simulate(long long steps) {
     int counter = 1;
 
     auto loop_start = std::chrono::steady_clock::now();
+    auto runtime_start = std::chrono::steady_clock::now();
 
     while (f > this->f_final) {
-        if (mc_sweep == 0)
+        if (take_time) {
             loop_start = std::chrono::steady_clock::now();
+            take_time = false;
+        }
 
-        for (int idx = 0; idx < this->ising_lattice->N_atm; ++idx) {
+        for (int idx = 0; idx < this->ising_lattice->N_atm * steps; ++idx) {
             flip_idx = this->rng->rand() % this->ising_lattice->N_atm;
             delta_E = this->ising_lattice->energy_flip(flip_idx);
 
@@ -90,24 +123,83 @@ void WL::simulate(long long steps) {
             this->hist[idx_E_config * this->ising_lattice->NM + idx_M_config]++;
             this->ln_JDOS[idx_E_config * this->ising_lattice->NM + idx_M_config] += log(f);
         }
+        mc_sweep += steps;
 
-        mc_sweep++;
-
-        if (mc_sweep % steps == 0 && this->flat_hist()) {
+        if (this->flat_hist()) {
             auto loop_end = std::chrono::steady_clock::now();
             double loop_dur = (double) (std::chrono::duration_cast<std::chrono::microseconds> (loop_end - loop_start).count()) * pow(10, -6);
 
-            std::printf("done: f=%d/%d  in %fs \n", counter, this->n_f_vals, loop_dur);
+            counter++;
+            take_time = true;
+
+            if (verbose) {
+                now = time(0);
+                t = ctime(&now); t.pop_back();
+                std::printf("%s | run: %d | f: %d/%d | time: %fs | steps: %ld \n", 
+                    t.c_str(),
+                    run, 
+                    counter, 
+                    this->n_f_vals, 
+                    loop_dur, 
+                    mc_sweep);
+            }
+            
+            this->time_iter[counter - 2] = loop_dur;
+            this->steps_iter[counter - 2] = mc_sweep;
 
             f = sqrt(f);
-            counter++;
             mc_sweep = 0;
-            for (int i = 0; i < this->ising_lattice->NE * this->ising_lattice->NM; ++i)
+            for (int i = 0; i < this->ising_lattice->NE * this->ising_lattice->NM; ++i) {
                 this->hist[i] = 0;
+            }
         }
     }
-
     this->normalize_JDOS();
+
+    auto runtime_end = std::chrono::steady_clock::now();
+    this->run_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (runtime_end - runtime_start).count()) * pow(10, -6);
+
+    if (verbose) {
+        std::printf("\n");
+    }
+    std::printf("    Run time: %fs \n", this->run_time);
+    now = time(0);
+    t = ctime(&now); t.pop_back();
+    std::printf("    Time: %s \n", t.c_str());
+    std::printf("Finished Wang-Landau Simulation; run : %d \n", run);
+}
+
+void WL::write_to_file(std::string name, bool debug) {
+    int status = system("mkdir results");
+
+    std::ofstream file1("results/" + name);
+    if (file1.is_open()) {
+        for (int i = 0; i < this->ising_lattice->NE; ++i) 
+        {
+            for (int j = 0; j < this->ising_lattice->NM; ++j) {
+                file1 << this->ising_lattice->JDOS[i * this->ising_lattice->NM + j] << " ";
+            }
+            file1 << "\n";
+        }
+        file1.close();
+    } else {
+        std:printf(" -- Error: can not open save file, please check you directory -- \n");
+    }
+
+    if (debug) {
+        int status = system("mkdir results/debug");
+
+        std::ofstream file2("results/debug/" + name);
+        if (file2.is_open()) {
+            file2 << this->run_time << "\n";
+            for (int i = 0; i < this->n_f_vals; i++) {
+                file2 << this->steps_iter[i] << " " << this->time_iter[i] << "\n";
+            }
+            file2.close();
+        } else {
+            std::printf(" -- Error: can not open debug file, please check you directory -- \n");
+        }
+    }
 }
 
 void WL::normalize_JDOS() {
@@ -121,15 +213,19 @@ void WL::normalize_JDOS() {
         }
 
         long double temp = 0;
-        for (int i = 0; i < this->ising_lattice->NE; ++i)
-            if (ln_JDOS[i * this->ising_lattice->NM + q] > 0)
+        for (int i = 0; i < this->ising_lattice->NE; ++i) {
+            if (ln_JDOS[i * this->ising_lattice->NM + q] > 0) {
                 temp += exp(this->ln_JDOS[i * this->ising_lattice->NM + q] - this->ln_JDOS[first_idx * this->ising_lattice->NM + q]);
+            }
+        }
 
         long double sum_ln_JDOS = ln_JDOS[first_idx * this->ising_lattice->NM + q] + log(temp);
 
-        for (int i = 0; i < this->ising_lattice->NE; ++i)
-            if (this->ln_JDOS[i * this->ising_lattice->NM + q] > 0)
+        for (int i = 0; i < this->ising_lattice->NE; ++i) {
+            if (this->ln_JDOS[i * this->ising_lattice->NM + q] > 0) {
                 this->ising_lattice->JDOS[i * this->ising_lattice->NM + q] = exp(this->ln_JDOS[i * this->ising_lattice->NM + q] + this->ising_lattice->norm_factor[q] - sum_ln_JDOS);
+            }
+        }
     }
 }
 
