@@ -1,8 +1,8 @@
 
-test: main_test.cpp system.cpp system.h wl.h wl.cpp rng.h 
-	g++-11 -fopenmp main_test.cpp system.cpp wl.cpp -o test
+test_wl: test_wl.cpp system.cpp system.h wl.h wl.cpp rng.h 
+	g++-11 -fopenmp test_wl.cpp system.cpp wl.cpp -o test_wl
 
-clean:
-	rm system.o
-	rm test
+test_fss: test_fss.cpp system.cpp system.h fss.h fss.cpp rng.h 
+	g++-11 -fopenmp test_ff.cpp system.cpp fss.cpp -o test_fss
+
 
