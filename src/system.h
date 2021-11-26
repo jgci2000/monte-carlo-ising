@@ -37,7 +37,7 @@ class System {
         int M_config;
 
         System();
-        System(int, int, std::string);
+        System(int L, int Sz, std::string lattice);
         ~System();
 
         void init_spins_random(RNG &rng);
@@ -46,7 +46,7 @@ class System {
         int energy();
         int magnetization();
 
-        int energy_flip(int);
+        int energy_flip(int site);
 
     private:
         std::map<int, int> create_map(int init, int final, int step) {
