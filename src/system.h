@@ -36,6 +36,9 @@ class System {
         int E_config;
         int M_config;
 
+        int max_E;
+        int max_M;
+
         System();
         System(int L, int Sz, std::string lattice);
         ~System();

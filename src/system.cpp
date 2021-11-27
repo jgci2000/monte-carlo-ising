@@ -35,11 +35,11 @@ System::System(int L, int Sz, std::string lattice) {
         std::printf(" -- Error invalid Lattice -- \n");
     }
 
-    int max_E = (1.0 / 2.0) * NN * N_atm;
-    int max_M = N_atm;
+    this->max_E = (1.0 / 2.0) * this->NN * this->N_atm;
+    this->max_M = N_atm;
 
-    this->NE = 1 + (max_E / 2.0);
-    this->NM = max_M + 1;
+    this->NE = 1 + (this->max_E / 2.0);
+    this->NM = this->max_M + 1;
 
     this->energies = this->create_map(- max_E, max_E, 4);
     this->magnetizations = this->create_map(- max_M, max_M, 2);
