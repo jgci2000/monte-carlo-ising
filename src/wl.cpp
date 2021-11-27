@@ -68,10 +68,7 @@ void WL::set_lattice(System &ising_lattice) {
 }
 
 void WL::set_rng(RNG &rng) {
-    std::printf("here \n");
     this->rng = &(rng);
-    std::printf("here \n");
-
 
     this->added_rng = true;
 }
