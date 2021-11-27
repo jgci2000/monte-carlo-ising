@@ -25,7 +25,10 @@ class WL {
         double *time_iter;
         long long *steps_iter;
 
-        void init(double, double, double, RNG &);
+        bool added_rng = false;
+        bool added_params = false;
+        bool added_lattice = false;
+
         long long min_hist();
         long double average_hist();
 
@@ -35,16 +38,19 @@ class WL {
     public:
         double run_time;
 
+        WL(RNG &rng);
+        WL(RNG &rng, System &ising_lattice);
         WL(double f_init, double f_final, double flatness, RNG &rng);
         WL(double f_init, double f_final, double flatness, RNG &rng, System &ising_lattice);
         ~WL();
 
-        void add_lattice(System &ising_system);
+        void set_lattice(System &ising_system);
+        void set_rng(RNG &rng);
+        void set_params(double f_init, double f_final, double flatness);
         void simulate(long long steps, int run=0, bool verbose=false);
-        void write_to_file(std::string name, bool debug=true);
-        
-        
 
+        void write_to_file(std::string name, bool debug=true);
+        void print_JDOS();
 };
 
 #endif

@@ -3,15 +3,27 @@
 
 #include <chrono>
 #include <fstream>
+#include <iostream>
 #include <stdlib.h>
 
+WL::WL(RNG &rng, System &ising_lattice) {
+    this->set_rng(rng);
+    this->set_lattice(ising_lattice);
+}
+
+WL::WL(RNG &rng) {
+    this->set_rng(rng);
+}
+
 WL::WL(double f_init, double f_final, double flatness, RNG &rng) {
-    this->init(f_init, f_final, flatness, rng);
+    this->set_rng(rng);
+    this->set_params(f_init, f_final, flatness);
 }
 
 WL::WL(double f_init, double f_final, double flatness, RNG &rng, System &ising_lattice) {
-    this->init(f_init, f_final, flatness, rng);
-    this->add_lattice(ising_lattice);
+    this->set_rng(rng);
+    this->set_params(f_init, f_final, flatness);
+    this->set_lattice(ising_lattice);
 }
 
 WL::~WL() {
@@ -21,12 +33,10 @@ WL::~WL() {
     delete[] this->steps_iter;
 }
 
-void WL::init(double f_init, double f_final, double flatness, RNG &rng) {
+void WL::set_params(double f_init, double f_final, double flatness) {
     this->f_init = f_init;
     this->f_final = f_final;
     this->flatness = flatness;
-
-    this->rng = &(rng);
 
     this->n_f_vals = 0;
     while (f_init > this->f_final) {
@@ -38,9 +48,11 @@ void WL::init(double f_init, double f_final, double flatness, RNG &rng) {
     this->steps_iter = new long long[this->n_f_vals];
 
     this->run_time = 0;
+    
+    this->added_params = true;
 }
 
-void WL::add_lattice(System &ising_lattice) {
+void WL::set_lattice(System &ising_lattice) {
     this->ising_lattice = &(ising_lattice);
     this->ising_lattice->init_spins_random(*(this->rng));
 
@@ -51,9 +63,24 @@ void WL::add_lattice(System &ising_lattice) {
         this->ln_JDOS[i] = 0;
         this->hist[i] = 0;
     }
+
+    this->added_lattice = true;
+}
+
+void WL::set_rng(RNG &rng) {
+    std::printf("here \n");
+    this->rng = &(rng);
+    std::printf("here \n");
+
+
+    this->added_rng = true;
 }
 
 void WL::simulate(long long steps, int run, bool verbose) {
+    if (!(this->added_lattice && this->added_params && this->added_rng)) {
+        std::printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
+    }
+
     std::printf("Initiating Wang-Landau Simulation; run: %d \n", run);
     time_t now = time(0);
     std::string t = ctime(&now); t.pop_back();
@@ -200,6 +227,17 @@ void WL::write_to_file(std::string name, bool debug) {
             std::printf(" -- Error: can not open debug file, please check you directory -- \n");
         }
     }
+}
+
+void WL::print_JDOS() {
+    std::printf("\nJDOS: \n");
+    for (int i = 0; i < this->ising_lattice->NE; ++i) 
+    {
+        for (int j = 0; j < this->ising_lattice->NM; ++j) {
+            std::cout << this->ising_lattice->JDOS[i * this->ising_lattice->NM + j] << " ";
+        }
+        std::cout << std::endl;
+    } 
 }
 
 void WL::normalize_JDOS() {
