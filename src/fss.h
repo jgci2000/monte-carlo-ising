@@ -3,6 +3,8 @@
 #define FSS_H
 
 #include <cmath>
+#include <vector>
+#include <array>
 #include <stdint.h>
 
 #include "system.h"
@@ -16,6 +18,7 @@ class FSS {
         int n_f_vals;
 
         long long *hist;
+        std::vector<int> *flip_list;
         
         System *ising_lattice;
         RNG *rng;
@@ -28,7 +31,10 @@ class FSS {
         bool added_lattice = false;
 
         long long min_hist();
-        void normalize_JDOS();
+        int normalize_JDOS(int q);
+        void first_step();
+        int random_config_q(int q);
+        void scan(int q, int idx_E_config);
 
     public:
         double run_time;
