@@ -15,7 +15,6 @@ class FSS {
         long long REP;
         int skip;
         int idx_M_max;
-        int n_f_vals;
 
         unsigned long long *hist;
         std::vector<int> *flip_list;
@@ -54,6 +53,5 @@ class FSS {
         void write_to_file(std::string name, bool debug=true);
         void print_JDOS();
 };
-
 
 #endif
