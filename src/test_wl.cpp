@@ -14,7 +14,7 @@ int main(int argv, char **argc) {
     
     WL wang_landau(exp(1), 1 + pow(10, -8), 0.9, rng, ising_lattice);
     
-    wang_landau.simulate(1000, 0, true);
+    wang_landau.simulate(10000, 0, true);
     wang_landau.print_JDOS();
     
     return 0;
