@@ -15,21 +15,21 @@ class WL {
         double flatness;
         int n_f_vals;
 
-        long long *hist;
+        unsigned long long *hist;
         long double *ln_JDOS;
-        long long mc_cycle;
+        unsigned long long mc_cycle;
         
         System *ising_lattice;
         RNG *rng;
 
         double *time_iter;
-        long long *steps_iter;
+        unsigned long long *steps_iter;
 
         bool added_rng = false;
         bool added_params = false;
         bool added_lattice = false;
 
-        long long min_hist();
+        unsigned long long min_hist();
         long double average_hist();
 
         void normalize_JDOS();
@@ -47,7 +47,7 @@ class WL {
         void set_lattice(System &ising_system);
         void set_rng(RNG &rng);
         void set_params(double f_init, double f_final, double flatness);
-        void simulate(long long steps, int run=0, bool verbose=false);
+        void simulate(unsigned long long steps, int run=0, bool verbose=false);
 
         void write_to_file(std::string name, bool debug=true);
         void print_JDOS();

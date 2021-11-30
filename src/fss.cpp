@@ -46,7 +46,7 @@ void FSS::set_lattice(System &ising_lattice) {
     this->ising_lattice = &(ising_lattice);
     this->ising_lattice->init_spins_random(*(this->rng));
 
-    this->hist = new long long[this->ising_lattice->NE];
+    this->hist = new unsigned long long[this->ising_lattice->NE];
     this->flip_list = new std::vector<int>[2];
 
     for (int i = 0; i < this->ising_lattice->NE; ++i) {
@@ -58,7 +58,7 @@ void FSS::set_lattice(System &ising_lattice) {
         this->idx_M_max = this->ising_lattice->NM / 2 - 3;
 
     this->time_iter = new double[this->idx_M_max];
-    this->steps_iter = new long long[this->idx_M_max];
+    this->steps_iter = new unsigned long long[this->idx_M_max];
 
     this->added_lattice = true;
 }
@@ -91,73 +91,46 @@ void FSS::simulate(int run, bool verbose) {
         std::printf("\n");
     }
 
-    // init variables
     int *new_spins_vector = new int[this->ising_lattice->N_atm];
 
     auto runtime_start = std::chrono::steady_clock::now();
 
     this->first_step();
-    std::printf("done! \n");
-
-    // LOOP
+    if (verbose) {
+        now = time(0);
+        t = ctime(&now); t.pop_back();
+        std::printf("%s | run: %d | q: %d/%d \n", 
+            t.c_str(),
+            run, 
+            0, 
+            this->idx_M_max);
+    }
 
     for (int q = 1; q <= this->idx_M_max; ++q) {
         auto q_start = std::chrono::steady_clock::now();
 
-        // Random config at q
-        int idx_E_config = this->random_config_q(q);
-        
-        // Update Histograms
+        int idx_E_config;
+        this->random_config_q(q, idx_E_config);
         this->hist[idx_E_config]++;
-
-        // Scan the first config
         this->scan(q, idx_E_config);
 
         long long k = 1;
         bool accepted = false;
 
-        // Where the magic happens
+        int new_E_config, new_idx_E_config;
+        int flipped_idx1, flipped_idx2;
+
+        long double ratio;
 
         while (this->min_hist() < this->REP) {
             for (int i = 0; !accepted && i < this->ising_lattice->N_atm; ++i)
                 new_spins_vector[i] =  this->ising_lattice->spins_vector[i];
 
-            int new_E_config = 0;
-            int new_idx_E_config = 0;
+            this->spin_flip(new_spins_vector, new_E_config, new_idx_E_config, flipped_idx1, flipped_idx2); 
 
-            // Flip a positive spin to a negative
+            ratio = this->ising_lattice->JDOS[idx_E_config * this->ising_lattice->NM + q] / this->ising_lattice->JDOS[new_idx_E_config * this->ising_lattice->NM + q];
 
-            int idx_tmp1 = this->rng->rand() % this->flip_list[0].size();
-            int flipped_idx1 = this->flip_list[0].at(idx_tmp1);
-            new_spins_vector[flipped_idx1] = - 1;
-
-            this->flip_list[1].push_back(flipped_idx1);
-            this->flip_list[0].erase(this->flip_list[0].begin() + idx_tmp1);
-
-            int delta_E = 0;
-            for (int a = 0; a < this->ising_lattice->NN; ++a)
-                delta_E += - new_spins_vector[flipped_idx1] * new_spins_vector[this->ising_lattice->NN_table[flipped_idx1 * this->ising_lattice->NN + a]];
-            new_E_config = this->ising_lattice->E_config + 2 * delta_E;
-
-            // Flip a negative spin to a positive
-
-            int idx_tmp2 = this->rng->rand() % this->flip_list[1].size();
-            int flipped_idx2 = this->flip_list[1].at(idx_tmp2);
-            new_spins_vector[flipped_idx2] = 1;
-
-            this->flip_list[0].push_back(flipped_idx2);
-            this->flip_list[1].erase(this->flip_list[1].begin() + idx_tmp2);
-
-            delta_E = 0;
-            for (int a = 0; a < this->ising_lattice->NN; ++a)
-                delta_E += - new_spins_vector[flipped_idx2] * new_spins_vector[this->ising_lattice->NN_table[flipped_idx2 * this->ising_lattice->NN + a]];
-            new_E_config = new_E_config + 2 * delta_E;          
-
-            // Wang Landau criteria
-
-            new_idx_E_config = this->ising_lattice->energies[new_E_config];
-            long double ratio = this->ising_lattice->JDOS[idx_E_config * this->ising_lattice->NM + q] / this->ising_lattice->JDOS[new_idx_E_config * this->ising_lattice->NM + q];
-
+            accepted = false;
             if (ratio >= 1 || this->rng->rand_uniform() < ratio || this->hist[new_idx_E_config] == 0) {
                 for (int i = 0; i < this->ising_lattice->N_atm; ++i)
                     this->ising_lattice->spins_vector[i] = new_spins_vector[i];
@@ -166,15 +139,12 @@ void FSS::simulate(int run, bool verbose) {
                 idx_E_config = new_idx_E_config;
                 accepted = true;
             }
-            else {
-                if (flipped_idx1 != flipped_idx2) {
-                    this->flip_list[0].pop_back();
-                    this->flip_list[0].push_back(flipped_idx1);
+            else if (flipped_idx1 != flipped_idx2) {
+                this->flip_list[0].pop_back();
+                this->flip_list[0].push_back(flipped_idx1);
 
-                    this->flip_list[1].pop_back();
-                    this->flip_list[1].push_back(flipped_idx2);
-                }
-                accepted = false;
+                this->flip_list[1].pop_back();
+                this->flip_list[1].push_back(flipped_idx2);
             }
 
             this->hist[idx_E_config]++;
@@ -185,16 +155,26 @@ void FSS::simulate(int run, bool verbose) {
             k++;
         }
 
-        // Normalize JDOS and output to console
         int hits = this->normalize_JDOS(q);
 
         auto q_end = std::chrono::steady_clock::now();
         double q_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (q_end - q_start).count()) * pow(10, -6);
 
-        now = time(0);
-        t = ctime(&now); t.pop_back();
+        if (verbose) {
+            now = time(0);
+            t = ctime(&now); t.pop_back();
+            std::printf("%s | run: %d | q: %d/%d | time: %fs | E: %ld | time/E: %fs \n", 
+                t.c_str(),
+                run, 
+                q, 
+                this->idx_M_max, 
+                q_time, 
+                hits, 
+                q_time / hits);
+        }
 
-        std::printf("done q=%d | E: %d | time/E: %f \n", q, hits, q_time / hits);
+        this->time_iter[q - 1] = q_time;
+        this->steps_iter[q - 1] = k;
     }
 
     auto runtime_end = std::chrono::steady_clock::now();
@@ -246,7 +226,7 @@ void FSS::first_step() {
     }
 }
 
-int FSS::random_config_q(int q) {
+void FSS::random_config_q(int &q, int &idx_E_config) {
     for (int i = 0; i < this->ising_lattice->NE; ++i) {
         this->hist[i] = 0;
     }
@@ -278,10 +258,10 @@ int FSS::random_config_q(int q) {
         this->ising_lattice->E_config += 2 * delta_E;
     }
 
-    return this->ising_lattice->energies[this->ising_lattice->E_config];
+    idx_E_config = this->ising_lattice->energies[this->ising_lattice->E_config];
 }
 
-void FSS::scan(int q, int idx_E_config) {
+void FSS::scan(int &q, int &idx_E_config) {
     int delta_E, E_tmp;
     int idx_E_tmp;
 
@@ -295,6 +275,34 @@ void FSS::scan(int q, int idx_E_config) {
 
         this->ising_lattice->JDOS[idx_E_tmp * this->ising_lattice->NM + q + 1] += this->ising_lattice->JDOS[idx_E_config * this->ising_lattice->NM + q] / this->REP;
     }
+}
+
+void FSS::spin_flip(int *new_spins_vector, int &new_E_config, int &new_idx_E_config, int &flipped_idx1, int &flipped_idx2) {
+    int idx_tmp1 = this->rng->rand() % this->flip_list[0].size();
+    flipped_idx1 = this->flip_list[0].at(idx_tmp1);
+    new_spins_vector[flipped_idx1] = - 1;
+
+    this->flip_list[1].push_back(flipped_idx1);
+    this->flip_list[0].erase(this->flip_list[0].begin() + idx_tmp1);
+
+    int delta_E = 0;
+    for (int a = 0; a < this->ising_lattice->NN; ++a)
+        delta_E += - new_spins_vector[flipped_idx1] * new_spins_vector[this->ising_lattice->NN_table[flipped_idx1 * this->ising_lattice->NN + a]];
+    new_E_config = this->ising_lattice->E_config + 2 * delta_E;
+
+    int idx_tmp2 = this->rng->rand() % this->flip_list[1].size();
+    flipped_idx2 = this->flip_list[1].at(idx_tmp2);
+    new_spins_vector[flipped_idx2] = 1;
+
+    this->flip_list[0].push_back(flipped_idx2);
+    this->flip_list[1].erase(this->flip_list[1].begin() + idx_tmp2);
+
+    delta_E = 0;
+    for (int a = 0; a < this->ising_lattice->NN; ++a)
+        delta_E += - new_spins_vector[flipped_idx2] * new_spins_vector[this->ising_lattice->NN_table[flipped_idx2 * this->ising_lattice->NN + a]];
+    new_E_config = new_E_config + 2 * delta_E;
+
+    new_idx_E_config = this->ising_lattice->energies[new_E_config];
 }
 
 void FSS::write_to_file(std::string name, bool debug) {
@@ -320,7 +328,7 @@ void FSS::write_to_file(std::string name, bool debug) {
         std::ofstream file2("results/debug/" + name);
         if (file2.is_open()) {
             file2 << this->run_time << "\n";
-            for (int i = 0; i < this->n_f_vals; i++) {
+            for (int i = 0; i < this->idx_M_max; i++) {
                 file2 << this->steps_iter[i] << " " << this->time_iter[i] << "\n";
             }
             file2.close();
@@ -341,7 +349,7 @@ void FSS::print_JDOS() {
     } 
 }
 
-int FSS::normalize_JDOS(int q) {
+int FSS::normalize_JDOS(int &q) {
     long double sum_JDOS = 0;
     for (int i = 0; i < this->ising_lattice->NE; ++i)
         if (this->ising_lattice->JDOS[i * this->ising_lattice->NM + q + 1] > 0)
@@ -357,8 +365,8 @@ int FSS::normalize_JDOS(int q) {
     return hits;
 }
 
-long long FSS::min_hist() {
-    long long min = __LONG_LONG_MAX__;
+unsigned long long FSS::min_hist() {
+    unsigned long long min = __UINT64_MAX__;
     for (int i = 0; i < this->ising_lattice->NE; i++)
         if (hist[i] != 0 && this->hist[i] < min)
             min = this->hist[i];

@@ -45,7 +45,7 @@ void WL::set_params(double f_init, double f_final, double flatness) {
     }
 
     this->time_iter = new double[this->n_f_vals];
-    this->steps_iter = new long long[this->n_f_vals];
+    this->steps_iter = new unsigned long long[this->n_f_vals];
 
     this->run_time = 0;
     
@@ -57,7 +57,7 @@ void WL::set_lattice(System &ising_lattice) {
     this->ising_lattice->init_spins_random(*(this->rng));
 
     this->ln_JDOS = new long double[this->ising_lattice->NE * this->ising_lattice->NM];
-    this->hist = new long long[this->ising_lattice->NE * this->ising_lattice->NM];
+    this->hist = new unsigned long long[this->ising_lattice->NE * this->ising_lattice->NM];
 
     for (int i = 0; i < this->ising_lattice->NE * this->ising_lattice->NM; ++i) {
         this->ln_JDOS[i] = 0;
@@ -73,7 +73,7 @@ void WL::set_rng(RNG &rng) {
     this->added_rng = true;
 }
 
-void WL::simulate(long long steps, int run, bool verbose) {
+void WL::simulate(unsigned long long steps, int run, bool verbose) {
     if (!(this->added_lattice && this->added_params && this->added_rng)) {
         std::printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
     }
@@ -280,8 +280,8 @@ long double WL::average_hist() {
     return sum / nnz;
 }
 
-long long WL::min_hist() {
-    long long min = __LONG_LONG_MAX__;
+unsigned long long WL::min_hist() {
+    unsigned long long min = __UINT64_MAX__;
     for (int i = 0; i < this->ising_lattice->NE * this->ising_lattice->NM; i++)
         if (hist[i] != 0 && this->hist[i] < min)
             min = this->hist[i];
