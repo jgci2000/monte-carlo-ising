@@ -49,7 +49,7 @@ class WL {
         void set_params(double f_init, double f_final, double flatness);
         void simulate(unsigned long long steps, int run=0, bool verbose=false);
 
-        void write_to_file(std::string name, bool debug=true);
+        void write_to_file(std::string name, std::string dir, bool debug=true);
         void print_JDOS();
 };
 

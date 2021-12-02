@@ -112,7 +112,7 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     long double ratio;
     
     long long mc_sweep = 0;
-    int counter = 1;
+    int counter = 0;
 
     auto loop_start = std::chrono::steady_clock::now();
     auto runtime_start = std::chrono::steady_clock::now();
@@ -168,8 +168,8 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
                     mc_sweep);
             }
             
-            this->time_iter[counter - 2] = loop_dur;
-            this->steps_iter[counter - 2] = mc_sweep;
+            this->time_iter[counter - 1] = loop_dur;
+            this->steps_iter[counter - 1] = mc_sweep;
 
             f = sqrt(f);
             mc_sweep = 0;
@@ -193,10 +193,11 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     std::printf("Finished Wang-Landau Simulation; run : %d \n", run);
 }
 
-void WL::write_to_file(std::string name, bool debug) {
-    int status = system("mkdir results");
+void WL::write_to_file(std::string name, std::string dir, bool debug) {
+    std::string command = "mkdir " + dir;
+    int status = system(command.c_str());
 
-    std::ofstream file1("results/" + name);
+    std::ofstream file1(dir + "/" + name);
     if (file1.is_open()) {
         for (int i = 0; i < this->ising_lattice->NE; ++i) 
         {
@@ -211,7 +212,8 @@ void WL::write_to_file(std::string name, bool debug) {
     }
 
     if (debug) {
-        int status = system("mkdir results/debug");
+        command += "/debug";
+        int status = system(command.c_str());
 
         std::ofstream file2("results/debug/" + name);
         if (file2.is_open()) {
