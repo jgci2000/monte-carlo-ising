@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     #pragma omp parallel for 
     for (int f_exp = f_init_exp; f_exp < f_final_exp; f_exp++) {
         int status = system("mkdir data");
-        std::string dir = "data/" + std::to_string(f_exp);
+        std::string dir = "data/" + std::to_string(atoi(argv[5])) + "/" + std::to_string(f_exp);
         double f_final = 1.0 + pow(10, -f_exp);
 
         for (int i = 0; i < run; ++i) {
