@@ -16,6 +16,7 @@ class System {
     public:
         int L;
         int N_atm;
+        double S;
         int Sz;
         int NN;
 
@@ -29,8 +30,11 @@ class System {
 
         int *NN_table;
         long double *norm_factor;
+        int **Npos;
+        std::vector<int> line_size_Npos;
 
         int *spins_vector;
+        int *spins_values;
         long double *JDOS;
 
         int E_config;
@@ -50,6 +54,7 @@ class System {
         int magnetization();
 
         int energy_flip(int site);
+        int energy_flip(int site, int new_spin_idx);
 
     private:
         std::map<int, int> create_map(int init, int final, int step) {
@@ -72,6 +77,18 @@ class System {
                 prev_pos = ++pos;
             }
             output.push_back(s.substr(prev_pos, pos-prev_pos)); // Last word
+            return output;
+        }
+
+        std::vector<int> split_int(const std::string& s, char seperator) {
+            std::vector<int> output;
+            std::string::size_type prev_pos = 0, pos = 0;
+            while((pos = s.find(seperator, pos)) != std::string::npos) {
+                std::string substring( s.substr(prev_pos, pos-prev_pos) );
+                output.push_back(stoi(substring));
+                prev_pos = ++pos;
+            }
+            output.push_back(stoi(s.substr(prev_pos, pos-prev_pos))); // Last word
             return output;
         }
 
@@ -111,6 +128,32 @@ class System {
                 }
                 else
                     std::cout << "Unable to open normalization factor file. Invalid lattice size or the file isn't on the correct directory." << std::endl;
+            }
+        }
+
+        void read_N_pos(std::string file_name) {
+            std::ifstream sum_npos_file(file_name);
+            std::string line;
+            if (sum_npos_file.is_open()) {
+                int i = 0;
+
+                std::getline(sum_npos_file, line);
+                line_size_Npos = split_int(line, ' ');
+
+                Npos = new int *[line_size_Npos.size()];
+
+                while (std::getline(sum_npos_file, line)) {
+                    Npos[i] = new int[line_size_Npos.at(i) * this->Sz];
+                    std::vector<int> a = split_int(line, ' ');
+                    for (int k = 0; k < line_size_Npos.at(i) * this->Sz; ++k) {
+                        Npos[i][k] = a.at(k);
+                    }
+                    i++;
+                }
+                sum_npos_file.close();
+            }
+            else {
+                std::cout << "Unable to sum Nppos file. Invalid lattice size, lattice type or total spin." << std::endl;
             }
         }
 };
