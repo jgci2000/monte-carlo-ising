@@ -1,7 +1,7 @@
 
 #include "system.h"
 
-System::System(int L, int Sz, std::string lattice) {
+System::System(int L, int Sz, std::string lattice, std::string dir) {
     this->L = L;
     this->Sz = Sz;
     this->S = (this->Sz - 1) / 2.0;
@@ -45,10 +45,10 @@ System::System(int L, int Sz, std::string lattice) {
     this->energies = this->create_map(- max_E, max_E, 4);
     this->magnetizations = this->create_map(- max_M, max_M, 2);
 
-    std::string NN_table_file_name = "neighbour_tables/neighbour_table_" + std::to_string(this->dim) + "D_" + this->lattice +
+    std::string NN_table_file_name = dir + "neighbour_tables/neighbour_table_" + std::to_string(this->dim) + "D_" + this->lattice +
     "_" + std::to_string(this->NN) + "NN_L" + std::to_string(this->L) + ".txt";
-    std::string norm_factor_file_name = "coefficients/coefficients_" + std::to_string(this->N_atm) + "d" + std::to_string(this->Sz) + ".txt";
-    std::string Npos_file_name = "sum_npos/sum_configs_Npos" + std::to_string(this->Sz) + "_N_atm" + std::to_string(this->N_atm) + ".txt";
+    std::string norm_factor_file_name = dir + "coefficients/coefficients_" + std::to_string(this->N_atm) + "d" + std::to_string(this->Sz) + ".txt";
+    std::string Npos_file_name = dir + "sum_npos/sum_configs_Npos" + std::to_string(this->Sz) + "_N_atm" + std::to_string(this->N_atm) + ".txt";
 
     this->norm_factor = new long double[this->NM];
     this->NN_table = new int[this->N_atm * this->NN];

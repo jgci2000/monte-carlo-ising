@@ -44,7 +44,7 @@ class System {
         int max_M;
 
         System();
-        System(int L, int Sz, std::string lattice);
+        System(int L, int Sz, std::string lattice, std::string dir="./");
         ~System();
 
         void init_spins_random(RNG &rng);
