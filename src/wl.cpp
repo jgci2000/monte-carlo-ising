@@ -75,26 +75,26 @@ void WL::set_rng(RNG &rng) {
 
 void WL::simulate(unsigned long long steps, int run, bool verbose) {
     if (!(this->added_lattice && this->added_params && this->added_rng)) {
-        std::printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
+        printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
     }
 
-    std::printf("Initiating Wang-Landau Simulation; run: %d \n", run);
+    printf("Initiating Wang-Landau Simulation; run: %d \n", run);
     time_t now = time(0);
     std::string t = ctime(&now); t.pop_back();
-    std::printf("    Time: %s \n", t.c_str());
+    printf("    Time: %s \n", t.c_str());
     if (verbose) {    
-        std::printf("    System:  L: %d | Sz: %d | N_atm: %d | lattice: %s | NN: %d \n",
+        printf("    System:  L: %d | Sz: %d | N_atm: %d | lattice: %s | NN: %d \n",
             this->ising_lattice->L, 
             this->ising_lattice->Sz,
             this->ising_lattice->N_atm,
             this->ising_lattice->lattice.c_str(), 
             this->ising_lattice->NN);
-        std::printf("    Simulation Parameters: f_init: %f | f_final: %f | flatness: %f | steps %ld \n",
+        printf("    Simulation Parameters: f_init: %f | f_final: %.11f | flatness: %.f | steps %ld \n",
             this->f_init, 
             this->f_final, 
             this->flatness, 
             steps);   
-        std::printf("\n");
+        printf("\n");
     }
 
     bool take_time = true;
@@ -159,7 +159,7 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
             if (verbose) {
                 now = time(0);
                 t = ctime(&now); t.pop_back();
-                std::printf("%s | run: %d | f: %d/%d | time: %fs | steps: %ld \n", 
+                printf("%s | run: %d | f: %d/%d | time: %fs | steps: %ld \n", 
                     t.c_str(),
                     run, 
                     counter, 
@@ -184,13 +184,13 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     this->run_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (runtime_end - runtime_start).count()) * pow(10, -6);
 
     if (verbose) {
-        std::printf("\n");
+        printf("\n");
     }
-    std::printf("    Run time: %fs \n", this->run_time);
+    printf("    Run time: %fs \n", this->run_time);
     now = time(0);
     t = ctime(&now); t.pop_back();
-    std::printf("    Time: %s \n", t.c_str());
-    std::printf("Finished Wang-Landau Simulation; run : %d \n", run);
+    printf("    Time: %s \n", t.c_str());
+    printf("Finished Wang-Landau Simulation; run : %d \n", run);
 }
 
 void WL::write_to_file(std::string name, std::string dir, bool debug) {
@@ -223,13 +223,13 @@ void WL::write_to_file(std::string name, std::string dir, bool debug) {
             }
             file2.close();
         } else {
-            std::printf(" -- Error: can not open debug file, please check you directory -- \n");
+            printf(" -- Error: can not open debug file, please check you directory -- \n");
         }
     }
 }
 
 void WL::print_JDOS() {
-    std::printf("\nJDOS: \n");
+    printf("\nJDOS: \n");
     for (int i = 0; i < this->ising_lattice->NE; ++i) 
     {
         for (int j = 0; j < this->ising_lattice->NM; ++j) {

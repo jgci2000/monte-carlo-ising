@@ -71,24 +71,24 @@ void FSS::set_rng(RNG &rng) {
 
 void FSS::simulate(int run, bool verbose) {
     if (!(this->added_lattice && this->added_params && this->added_rng)) {
-        std::printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
+        printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
     }
 
-    std::printf("Initiating Flat Scan Sampling Simulation; run: %d \n", run);
+    printf("Initiating Flat Scan Sampling Simulation; run: %d \n", run);
     time_t now = time(0);
     std::string t = ctime(&now); t.pop_back();
-    std::printf("    Time: %s \n", t.c_str());
+    printf("    Time: %s \n", t.c_str());
     if (verbose) {    
-        std::printf("    System:  L: %d | Sz: %d | N_atm: %d | lattice: %s | NN: %d \n",
+        printf("    System:  L: %d | Sz: %d | N_atm: %d | lattice: %s | NN: %d \n",
             this->ising_lattice->L, 
             this->ising_lattice->Sz,
             this->ising_lattice->N_atm,
             this->ising_lattice->lattice.c_str(), 
             this->ising_lattice->NN);
-        std::printf("    Simulation Parameters: REP: %ld | skip: %d \n",
+        printf("    Simulation Parameters: REP: %ld | skip: %d \n",
             this->REP, 
             this->skip);   
-        std::printf("\n");
+        printf("\n");
     }
 
     int *new_spins_vector = new int[this->ising_lattice->N_atm];
@@ -99,7 +99,7 @@ void FSS::simulate(int run, bool verbose) {
     if (verbose) {
         now = time(0);
         t = ctime(&now); t.pop_back();
-        std::printf("%s | run: %d | q: %d/%d \n", 
+        printf("%s | run: %d | q: %d/%d \n", 
             t.c_str(),
             run, 
             0, 
@@ -163,7 +163,7 @@ void FSS::simulate(int run, bool verbose) {
         if (verbose) {
             now = time(0);
             t = ctime(&now); t.pop_back();
-            std::printf("%s | run: %d | q: %d/%d | time: %fs | E: %ld | time/E: %fs \n", 
+            printf("%s | run: %d | q: %d/%d | time: %fs | E: %ld | time/E: %fs \n", 
                 t.c_str(),
                 run, 
                 q, 
@@ -181,13 +181,13 @@ void FSS::simulate(int run, bool verbose) {
     this->run_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (runtime_end - runtime_start).count()) * pow(10, -6);
 
     if (verbose) {
-        std::printf("\n");
+        printf("\n");
     }
-    std::printf("    Run time: %fs \n", this->run_time);
+    printf("    Run time: %fs \n", this->run_time);
     now = time(0);
     t = ctime(&now); t.pop_back();
-    std::printf("    Time: %s \n", t.c_str());
-    std::printf("Finished Flat Scan Sampling Simulation; run : %d \n", run);
+    printf("    Time: %s \n", t.c_str());
+    printf("Finished Flat Scan Sampling Simulation; run : %d \n", run);
 
     delete[] new_spins_vector;
 }
@@ -333,13 +333,13 @@ void FSS::write_to_file(std::string name, bool debug) {
             }
             file2.close();
         } else {
-            std::printf(" -- Error: can not open debug file, please check you directory -- \n");
+            printf(" -- Error: can not open debug file, please check you directory -- \n");
         }
     }
 }
 
 void FSS::print_JDOS() {
-    std::printf("\nJDOS: \n");
+    printf("\nJDOS: \n");
     for (int i = 0; i < this->ising_lattice->NE; ++i) 
     {
         for (int j = 0; j < this->ising_lattice->NM; ++j) {
