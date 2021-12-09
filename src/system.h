@@ -43,7 +43,6 @@ class System {
         int max_E;
         int max_M;
 
-        System();
         System(int L, int Sz, std::string lattice, std::string dir="./");
         ~System();
 
@@ -55,6 +54,7 @@ class System {
 
         int energy_flip(int site);
         int energy_flip(int site, int new_spin_idx);
+        int magnetization_flip(int site, int new_spin_idx);
 
     private:
         std::map<int, int> create_map(int init, int final, int step) {

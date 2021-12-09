@@ -89,7 +89,7 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
             this->ising_lattice->N_atm,
             this->ising_lattice->lattice.c_str(), 
             this->ising_lattice->NN);
-        printf("    Simulation Parameters: f_init: %f | f_final: %.11f | flatness: %.f | steps %ld \n",
+        printf("    Simulation Parameters: f_init: %f | f_final: %.11f | flatness: %.2f | steps %ld \n",
             this->f_init, 
             this->f_final, 
             this->flatness, 
@@ -104,8 +104,8 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     int idx_E_config = this->ising_lattice->energies[this->ising_lattice->E_config];
     int idx_M_config = this->ising_lattice->magnetizations[this->ising_lattice->M_config];
 
-    int flip_idx;
-    int delta_E;
+    int flip_idx, flip_spin_to_idx;
+    int delta_E, delta_M;
     int new_E_config, new_M_config;
     int new_idx_E_config, new_idx_M_config;
 
@@ -125,18 +125,19 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
 
         for (int idx = 0; idx < this->ising_lattice->N_atm * steps; ++idx) {
             flip_idx = this->rng->rand() % this->ising_lattice->N_atm;
-            delta_E = this->ising_lattice->energy_flip(flip_idx);
+            flip_spin_to_idx = this->rng->rand() % this->ising_lattice->Sz;
+            delta_E = this->ising_lattice->energy_flip(flip_idx, flip_spin_to_idx);
+            delta_M = this->ising_lattice->magnetization_flip(flip_idx, flip_spin_to_idx);
 
-            new_E_config = this->ising_lattice->E_config - 2 * delta_E;
-            new_M_config  = this->ising_lattice->M_config - 2 * this->ising_lattice->spins_vector[flip_idx];
+            new_E_config = this->ising_lattice->E_config + delta_E;
+            new_M_config  = this->ising_lattice->M_config + delta_M;
             new_idx_E_config = this->ising_lattice->energies[new_E_config];
             new_idx_M_config = this->ising_lattice->magnetizations[new_M_config];
 
             ratio = exp(ln_JDOS[idx_E_config * this->ising_lattice->NM + idx_M_config] - ln_JDOS[new_idx_E_config * this->ising_lattice->NM + new_idx_M_config]);
 
             if (ratio >= 1 || this->rng->rand_uniform() < ratio) {
-                this->ising_lattice->spins_vector[flip_idx] =
-                    - this->ising_lattice->spins_vector[flip_idx];
+                this->ising_lattice->spins_vector[flip_idx] = this->ising_lattice->spins_values[flip_spin_to_idx];
 
                 this->ising_lattice->E_config = new_E_config;
                 idx_E_config = new_idx_E_config;

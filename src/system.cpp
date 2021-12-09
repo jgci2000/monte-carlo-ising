@@ -70,8 +70,6 @@ System::System(int L, int Sz, std::string lattice, std::string dir) {
     }
 }
 
-System::System() {}
-
 System::~System() {
     delete[] this->norm_factor;
     delete[] this->NN_table;
@@ -84,7 +82,7 @@ System::~System() {
 
 void System::init_spins_max_M() {
     for (int i = 0; i < this->N_atm; ++i) {
-        this->spins_vector[i] = 1;
+        this->spins_vector[i] = this->spins_values[this->Sz - 1];
     }
 
     this->E_config = this->energy();
@@ -93,10 +91,8 @@ void System::init_spins_max_M() {
 
 void System::init_spins_random(RNG &rng) {
     for (int i = 0; i < this->N_atm; ++i) {
-        if (rng.rand_uniform() < 0.5)
-            this->spins_vector[i] = 1;
-        else
-            this->spins_vector[i] = -1;
+        int idx = rand() % this->Sz;
+        this->spins_vector[i] = this->spins_values[idx];
     }
 
     this->E_config = this->energy();
@@ -139,4 +135,18 @@ int System::energy_flip(int site, int new_spin_idx) {
         E_tmp2 += - this->spins_values[new_spin_idx] * this->spins_vector[this->NN_table[site * this->NN + a]];
     }
     return E_tmp2 - E_tmp1;
+}
+
+int System::magnetization_flip(int site, int new_spin_idx) {
+    // int M_tmp1 = 0;
+    // for (int a = 0; a < this->NN; ++a) {
+    //     M_tmp1 += - this->spins_vector[site] * this->spins_vector[this->NN_table[site * this->NN + a]];
+    // }
+    // int M_tmp2 = 0;
+    // for (int a = 0; a < this->NN; ++a) {
+    //     M_tmp2 += - this->spins_values[new_spin_idx] * this->spins_vector[this->NN_table[site * this->NN + a]];
+    // }
+    // return M_tmp2 - M_tmp1;
+
+    return this->spins_values[new_spin_idx] - this->spins_vector[site];
 }
