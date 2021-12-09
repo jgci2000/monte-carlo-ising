@@ -104,7 +104,23 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     int idx_E_config = this->ising_lattice->energies[this->ising_lattice->E_config];
     int idx_M_config = this->ising_lattice->magnetizations[this->ising_lattice->M_config];
 
-    int flip_idx, flip_spin_to_idx;
+    int **flip_to = new int*[this->ising_lattice->N_atm];
+    int *is_at = new int[this->ising_lattice->N_atm];
+    for (int i = 0; i < this->ising_lattice->N_atm; ++i) {
+        int c = 0;
+        flip_to[i] = new int[this->ising_lattice->Sz - 1];
+        for (int j = 0; j < this->ising_lattice->Sz; ++j) {
+            if (this->ising_lattice->spins_vector[i] != this->ising_lattice->spins_values[j]) {
+                flip_to[i][c] = j;
+                c++;
+            }
+            else {
+                is_at[i] = j;
+            }
+        }
+    }
+
+    int flip_idx, flip_spin_to_idx, tmp_idx;
     int delta_E, delta_M;
     int new_E_config, new_M_config;
     int new_idx_E_config, new_idx_M_config;
@@ -125,7 +141,9 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
 
         for (int idx = 0; idx < this->ising_lattice->N_atm * steps; ++idx) {
             flip_idx = this->rng->rand() % this->ising_lattice->N_atm;
-            flip_spin_to_idx = this->rng->rand() % this->ising_lattice->Sz;
+            tmp_idx = this->rng->rand() % (this->ising_lattice->Sz - 1);
+            flip_spin_to_idx = flip_to[flip_idx][tmp_idx];
+
             delta_E = this->ising_lattice->energy_flip(flip_idx, flip_spin_to_idx);
             delta_M = this->ising_lattice->magnetization_flip(flip_idx, flip_spin_to_idx);
 
@@ -143,6 +161,9 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
                 idx_E_config = new_idx_E_config;
                 this->ising_lattice->M_config = new_M_config;
                 idx_M_config = new_idx_M_config;
+
+                flip_to[flip_idx][tmp_idx] = is_at[flip_idx];
+                is_at[flip_idx] = flip_spin_to_idx;
             }
 
             this->hist[idx_E_config * this->ising_lattice->NM + idx_M_config]++;
@@ -192,6 +213,12 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     t = ctime(&now); t.pop_back();
     printf("    Time: %s \n", t.c_str());
     printf("Finished Wang-Landau Simulation; run : %d \n", run);
+
+    for (int i = 0; i < this->ising_lattice->N_atm; ++i) {
+        delete[] flip_to[i];
+    }
+    delete[] flip_to;
+    delete[] is_at;
 }
 
 void WL::write_to_file(std::string name, std::string dir, bool debug) {
