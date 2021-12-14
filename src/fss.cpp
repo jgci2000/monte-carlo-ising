@@ -31,6 +31,10 @@ FSS::~FSS() {
     delete[] this->flip_list;
     delete[] this->time_iter;
     delete[] this->steps_iter;
+    for (int i = 0; i < this->ising_lattice->NM; ++i) {
+        delete[] this->JDOS_M_spin[i];
+    }
+    delete[] this->JDOS_M_spin;
 }
 
 void FSS::set_params(long long REP, int skip) {
@@ -59,6 +63,16 @@ void FSS::set_lattice(System &ising_lattice) {
 
     this->time_iter = new double[this->idx_M_max];
     this->steps_iter = new unsigned long long[this->idx_M_max];
+
+    this->JDOS_M_spin = new long double*[this->ising_lattice->NM];
+    for (int i = 0; i < this->ising_lattice->NM; ++i) {
+        this->JDOS_M_spin[i] = new long double[this->ising_lattice->line_size_Npos.at(i) * this->ising_lattice->NE];
+    }
+    for (int i = 0; i < this->ising_lattice->NM; ++i) {
+        for (int j = 0; j < this->ising_lattice->line_size_Npos.at(i) * this->ising_lattice->NE; ++j) {
+            this->JDOS_M_spin[i][j] = 0;
+        }
+    }
 
     this->added_lattice = true;
 }
@@ -90,13 +104,32 @@ void FSS::simulate(int run, bool verbose) {
             this->skip);   
         printf("\n");
     }
+    
+    if (this->ising_lattice->Sz == 2) {
+        this->simulate_Sz_2(run, verbose);
+    } else {
+        this->simulate_Sz_S(run, verbose);
+    }
 
+    if (verbose) {
+        printf("\n");
+    }
+    printf("    Run time: %fs \n", this->run_time);
+    now = time(0);
+    t = ctime(&now); t.pop_back();
+    printf("    Time: %s \n", t.c_str());
+    printf("Finished Flat Scan Sampling Simulation; run : %d \n", run);
+}
+
+void FSS::simulate_Sz_2(int run, bool verbose) {
     int *new_spins_vector = new int[this->ising_lattice->N_atm];
 
     auto runtime_start = std::chrono::steady_clock::now();
 
     this->first_step();
     if (verbose) {
+        time_t now = time(0);
+        std::string t = ctime(&now); t.pop_back();
         now = time(0);
         t = ctime(&now); t.pop_back();
         printf("%s | run: %d | q: %d/%d \n", 
@@ -161,6 +194,8 @@ void FSS::simulate(int run, bool verbose) {
         double q_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (q_end - q_start).count()) * pow(10, -6);
 
         if (verbose) {
+            time_t now = time(0);
+            std::string t = ctime(&now); t.pop_back();
             now = time(0);
             t = ctime(&now); t.pop_back();
             printf("%s | run: %d | q: %d/%d | time: %fs | E: %ld | time/E: %fs \n", 
@@ -179,15 +214,6 @@ void FSS::simulate(int run, bool verbose) {
 
     auto runtime_end = std::chrono::steady_clock::now();
     this->run_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (runtime_end - runtime_start).count()) * pow(10, -6);
-
-    if (verbose) {
-        printf("\n");
-    }
-    printf("    Run time: %fs \n", this->run_time);
-    now = time(0);
-    t = ctime(&now); t.pop_back();
-    printf("    Time: %s \n", t.c_str());
-    printf("Finished Flat Scan Sampling Simulation; run : %d \n", run);
 
     delete[] new_spins_vector;
 }

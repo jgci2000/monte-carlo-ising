@@ -18,6 +18,7 @@ class FSS {
 
         unsigned long long *hist;
         std::vector<int> *flip_list;
+        long double **JDOS_M_spin;
         
         System *ising_lattice;
         RNG *rng;
@@ -35,6 +36,20 @@ class FSS {
         void random_config_q(int &q, int &idx_E_config);
         void scan(int &q, int &idx_E_config);
         void spin_flip(int *new_spins_vector, int &new_E_config, int &new_idx_E_config, int &flipped_idx1, int &flipped_idx2);
+
+        void simulate_Sz_2(int run, bool verbose);
+
+        void simulate_Sz_S(int run, bool verbose);
+        void first_step_Sz_S(std::vector<int> &SPM);
+
+        long long min_hist2(long long *hist, int size) 
+        {
+            long long min = __LONG_LONG_MAX__;
+            for (int i = 0; i < size; i++) 
+                if (hist[i] != 0 && hist[i] < min)
+                    min = hist[i];
+            return min;
+        }
 
     public:
         double run_time;
