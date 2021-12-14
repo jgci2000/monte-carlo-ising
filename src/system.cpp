@@ -61,8 +61,9 @@ System::System(int L, int Sz, std::string lattice, std::string dir) {
     
     this->spins_values = new int[this->Sz];
     for (int i = 0; i < this->Sz; ++i) {
-        this->spins_values[i] = - 2 * this->S + 2 * i;
+        this->spins_values[i] = 2 * this->S - 2 * i;
     }
+
 
     this->JDOS = new long double[this->NE * this->NM];
     for (int i = 0; i < this->NE * this->NM; ++i) {
@@ -138,15 +139,5 @@ int System::energy_flip(int site, int new_spin_idx) {
 }
 
 int System::magnetization_flip(int site, int new_spin_idx) {
-    // int M_tmp1 = 0;
-    // for (int a = 0; a < this->NN; ++a) {
-    //     M_tmp1 += - this->spins_vector[site] * this->spins_vector[this->NN_table[site * this->NN + a]];
-    // }
-    // int M_tmp2 = 0;
-    // for (int a = 0; a < this->NN; ++a) {
-    //     M_tmp2 += - this->spins_values[new_spin_idx] * this->spins_vector[this->NN_table[site * this->NN + a]];
-    // }
-    // return M_tmp2 - M_tmp1;
-
     return this->spins_values[new_spin_idx] - this->spins_vector[site];
 }
