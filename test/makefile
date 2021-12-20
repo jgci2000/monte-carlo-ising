@@ -7,3 +7,4 @@ test_fss: test_fss.cpp
 
 test_spins: test_spinS.cpp 
 	g++-11 test_spinS.cpp ../src/system.cpp ../src/wl.cpp ../src/fss.cpp ../src/fss_spinS.cpp -o test_spins
+
