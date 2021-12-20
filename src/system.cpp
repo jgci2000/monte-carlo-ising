@@ -1,10 +1,24 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #include "system.h"
 
+/**
+ * System Class
+ * Contains all of the information about an Ising system. 
+ * Can be fead in to the Flat Scan Sampling and Wang Landau classes. 
+ * @param L        (int): Size of the lattice.
+ * @param Sz       (int): Spin number in the z direction.
+ * @param lattice  (string): Lattice of the system.
+ *                                Options are {"SS", "SC", "BCC", "FCC", "HCP", "HEX"}
+ * @param dir      (string): Directory of the normalization, sum N_pos and NN table files
+ */
 System::System(int L, int Sz, std::string lattice, std::string dir) {
     this->L = L;
     this->Sz = Sz;
-    this->S = (this->Sz - 1) / 2.0;
+    this->S = (this->Sz - 1.0) / 2.0;
 
     this->lattice = lattice;
 
@@ -81,6 +95,9 @@ System::~System() {
     delete[] this->Npos;
 }
 
+/**
+ * Initialize spins to the maximum magnetization and minimum energy configuration.
+ */
 void System::init_spins_max_M() {
     for (int i = 0; i < this->N_atm; ++i) {
         this->spins_vector[i] = this->spins_values[0];
@@ -90,6 +107,11 @@ void System::init_spins_max_M() {
     this->M_config = this->magnetization();
 }
 
+/**
+ * Initialize the spins randomly.
+ * @param rng  (RNG): reference to a random number generator
+ *                  from the RNG class.
+ */
 void System::init_spins_random(RNG &rng) {
     for (int i = 0; i < this->N_atm; ++i) {
         int idx = rand() % this->Sz;
@@ -100,6 +122,11 @@ void System::init_spins_random(RNG &rng) {
     this->M_config = this->magnetization();
 }
 
+/**
+ * Computes the energy of the lattice.
+ * 
+ * @return energy (int)
+ */
 int System::energy() {
     int E_config = 0;
     for (int i = 0; i < this->N_atm; ++i) {
@@ -110,6 +137,11 @@ int System::energy() {
     return E_config / 2;
 }
 
+/**
+ * Computes the magetization of the lattice.
+ * 
+ * @return magnetization (int)
+ */
 int System::magnetization() {
     int M_config = 0;
     for (int i = 0; i < this->N_atm; ++i) {
@@ -118,6 +150,13 @@ int System::magnetization() {
     return M_config;
 }
 
+/**
+ * Computes the difference in energy from a spin flip, 
+ * given the index if the spin to flip.
+ * 
+ * @param site  (int): Index of the spin to flip.
+ * @return delta_E (int): Difference in energy generated from the flip.
+ */
 int System::energy_flip(int site) {
     int delta_E = 0;
     for (int a = 0; a < this->NN; ++a) {
@@ -126,6 +165,15 @@ int System::energy_flip(int site) {
     return delta_E;
 }
 
+/**
+ * Computes the difference in energy from a spin flip, 
+ * given the index if the spin to flip 
+ * and the index of the spin value to flip it to.
+ * 
+ * @param site  (int): Index of the spin to flip.
+ * @param new_spin_idx  (int): Index of the new spin value.
+ * @return delta_E (int)
+ */
 int System::energy_flip(int site, int new_spin_idx) {
     int E_tmp1 = 0;
     for (int a = 0; a < this->NN; ++a) {
@@ -138,6 +186,15 @@ int System::energy_flip(int site, int new_spin_idx) {
     return E_tmp2 - E_tmp1;
 }
 
+/** 
+ * Computes the difference in magnetization from a spin flip, 
+ * given the index if the spin to flip 
+ * and the index of the spin value to flip it to. 
+ * 
+ * @param site  (int): Index of the spin to flip.
+ * @param new_spin_idx  (int): Index of the new spin value.
+ * @return delta_M (int)
+ */
 int System::magnetization_flip(int site, int new_spin_idx) {
     return this->spins_values[new_spin_idx] - this->spins_vector[site];
 }

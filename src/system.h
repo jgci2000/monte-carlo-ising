@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #ifndef SYSTEM_H
 #define SYSTEM_H
@@ -12,6 +16,16 @@
 
 #include "rng.h"
 
+/**
+ * System Class 
+ * Contains all of the information about an Ising system.
+ * Can be fead in to the Flat Scan Sampling and Wang Landau classes.
+ * @param L        (int): Size of the lattice.
+ * @param Sz       (int): Spin number in the z direction.
+ * @param lattice  (string): Lattice of the system.
+ *                                Options are {"SS", "SC", "BCC", "FCC", "HCP", "HEX"}
+ * @param dir      (string): Directory of the normalization, sum N_pos and NN table files
+ */
 class System {
     public:
         int L;
