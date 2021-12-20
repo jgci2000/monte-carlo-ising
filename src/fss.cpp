@@ -198,7 +198,7 @@ void FSS::simulate_Sz_2(int run, bool verbose) {
             std::string t = ctime(&now); t.pop_back();
             now = time(0);
             t = ctime(&now); t.pop_back();
-            printf("%s | run: %d | q: %d/%d | time: %fs | E: %ld | time/E: %fs \n", 
+            printf("%s | run: %d | q: %d/%d | time: %fs | E: %d | time/E: %fs \n", 
                 t.c_str(),
                 run, 
                 q, 
