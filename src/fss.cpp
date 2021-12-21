@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #include "fss.h"
 
@@ -6,20 +10,42 @@
 #include <iostream>
 #include <stdint.h>
 
+/**
+ * Flat Scan Sampling class. 
+ * @param rng (RNG): Reference to an RNG object.
+ * @param ising_lattice (System): reference to a System object. 
+ */
 FSS::FSS(RNG &rng, System &ising_lattice) {
     this->set_rng(rng);
     this->set_lattice(ising_lattice);
 }
 
+/**
+ * Flat Scan Sampling class. 
+ * @param rng (RNG): Reference to an RNG object.
+ */
 FSS::FSS(RNG &rng) {
     this->set_rng(rng);
 }
 
+/**
+ * Flat Scan Sampling class. 
+ * @param REP (unsigned long): Value of REP for the calculations. Should be large enough to ensure convergence.
+ * @param skip (int): Value of the skip parameter. Usually set to the number of spins in the system.
+ * @param rng (RNG): Reference to an RNG object.
+ */
 FSS::FSS(long long REP, int skip, RNG &rng) {
     this->set_rng(rng);
     this->set_params(REP, skip);
 }
 
+/**
+ * Flat Scan Sampling class. 
+ * @param REP (unsigned long): Value of REP for the calculations. Should be large enough to ensure convergence.
+ * @param skip (int): Value of the skip parameter. Usually set to the number of spins in the system.
+ * @param rng (RNG): Reference to an RNG object.
+ * @param ising_lattice (System): reference to a System object. 
+ */
 FSS::FSS(long long REP, int skip, RNG &rng, System &ising_lattice) {
     this->set_rng(rng);
     this->set_params(REP, skip);
@@ -37,6 +63,11 @@ FSS::~FSS() {
     delete[] this->JDOS_M_spin;
 }
 
+/**
+ * Sets the parameters to the Flat Scan Sampling instance.
+ * @param REP (unsigned long): Value of REP for the calculations. Should be large enough to ensure convergence.
+ * @param skip (int): Value of the skip parameter. Usually set to the number of spins in the system.
+ */
 void FSS::set_params(long long REP, int skip) {
     this->REP = REP;
     this->skip = skip;
@@ -46,6 +77,10 @@ void FSS::set_params(long long REP, int skip) {
     this->added_params = true;
 }
 
+/**
+ * Sets Ising lattice for Flat Scan Sampling class.
+ * @param ising_lattice (System): Reference to System object.
+ */
 void FSS::set_lattice(System &ising_lattice) {
     this->ising_lattice = &(ising_lattice);
     this->ising_lattice->init_spins_random(*(this->rng));
@@ -77,12 +112,23 @@ void FSS::set_lattice(System &ising_lattice) {
     this->added_lattice = true;
 }
 
+/**
+ * Sets RNG for the Flat Scan Sampling class.
+ * @param rng (RNG): Reference to RNG object.
+ */
 void FSS::set_rng(RNG &rng) {
     this->rng = &(rng);
 
     this->added_rng = true;
 }
 
+/**
+ * Estimates the Joint Density of States for with the Flat Scan Sampling
+ * algorithm, with respect to the parameters and lattice passes beforehand.
+ * @param run (int): Should be passed 0, if only doing one run. Used to keep track of how many times 
+ * the algorithm has run in a given script.
+ * @param verbose (bool): If true, output information about the simulation each iteration.
+ */
 void FSS::simulate(int run, bool verbose) {
     if (!(this->added_lattice && this->added_params && this->added_rng)) {
         printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");

@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #ifndef WL_H
 #define WL_H
@@ -8,6 +12,15 @@
 #include "system.h"
 #include "rng.h"
 
+/**
+ * Wang Landau class. 
+ * Implements the Wang Landau algorithm for the calculation 
+ * of the Joint Density of States for the Ising model. 
+ * A System and RNG objects need to be added to this class so the 
+ * algorithm works as intended.
+ * Can output the number of steps for each iteration and the time taken.
+ * One can access the total run time trough the variable run_time.
+ */
 class WL {
     private:
         double f_init;

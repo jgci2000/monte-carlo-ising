@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #ifndef FSS_H
 #define FSS_H
@@ -10,6 +14,15 @@
 #include "system.h"
 #include "rng.h"
 
+/**
+ * Flat Scan Sampling class.
+ * Implements the Flat Scan Sampling method for the Ising model,
+ * to estimate the Joint Density of States.
+ * A System and RNG objects need to be added to ensure that the 
+ * simulation works.
+ * Can output the number of steps bet iteration and the time taken. 
+ * One can access the total run time trough the variable run_time.
+ */
 class FSS {
     private:
         long long REP;

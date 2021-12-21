@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #include "wl.h"
 
@@ -6,20 +10,44 @@
 #include <iostream>
 #include <stdlib.h>
 
+/**
+ * Wang Landau class. 
+ * @param rng (RNG): Reference to an RNG object.
+ * @param ising_lattice (System): reference to a System object. 
+ */
 WL::WL(RNG &rng, System &ising_lattice) {
     this->set_rng(rng);
     this->set_lattice(ising_lattice);
 }
 
+/**
+ * Wang Landau class. 
+ * @param rng (RNG): Reference to an RNG object.
+ */
 WL::WL(RNG &rng) {
     this->set_rng(rng);
 }
 
+/**
+ * Wang Landau class. 
+ * @param f_init (double): Initial value for the inital modification factor. Usually set to exp(1).
+ * @param f_final (double): Final value for the modification factor. Should be very close to 1, e.g. 1 + 10^(-8).
+ * @param flatness (double): Flatness criteria. Value between 0 and 1. Usually 0.9.
+ * @param rng (RNG): Reference to an RNG object.
+ */
 WL::WL(double f_init, double f_final, double flatness, RNG &rng) {
     this->set_rng(rng);
     this->set_params(f_init, f_final, flatness);
 }
 
+/**
+ * Wang Landau class. 
+ * @param f_init (double): Initial value for the inital modification factor. Usually set to exp(1).
+ * @param f_final (double): Final value for the modification factor. Should be very close to 1, e.g. 1 + 10^(-8).
+ * @param flatness (double): Flatness criteria. Value between 0 and 1. Usually 0.9.
+ * @param rng (RNG): Reference to an RNG object.
+ * @param ising_lattice (System): reference to a System object. 
+ */
 WL::WL(double f_init, double f_final, double flatness, RNG &rng, System &ising_lattice) {
     this->set_rng(rng);
     this->set_params(f_init, f_final, flatness);
@@ -33,6 +61,12 @@ WL::~WL() {
     delete[] this->steps_iter;
 }
 
+/**
+ * Sets parameters for Wang Landau class. 
+ * @param f_init (double): Initial value for the inital modification factor. Usually set to exp(1).
+ * @param f_final (double): Final value for the modification factor. Should be very close to 1, e.g. 1 + 10^(-8).
+ * @param flatness (double): Flatness criteria. Value between 0 and 1. Usually 0.9.
+ */
 void WL::set_params(double f_init, double f_final, double flatness) {
     this->f_init = f_init;
     this->f_final = f_final;
@@ -52,6 +86,10 @@ void WL::set_params(double f_init, double f_final, double flatness) {
     this->added_params = true;
 }
 
+/**
+ * Sets Ising lattice for Wang Landau class.
+ * @param ising_lattice (System): Reference to System object.
+ */
 void WL::set_lattice(System &ising_lattice) {
     this->ising_lattice = &(ising_lattice);
     this->ising_lattice->init_spins_random(*(this->rng));
@@ -67,12 +105,24 @@ void WL::set_lattice(System &ising_lattice) {
     this->added_lattice = true;
 }
 
+/**
+ * Sets RNG for the Wang Landau class.
+ * @param rng (RNG): Reference to RNG object.
+ */
 void WL::set_rng(RNG &rng) {
     this->rng = &(rng);
 
     this->added_rng = true;
 }
 
+/**
+ * Estimates the Joint Density of States for with the Wang Landau
+ * algorithm, with respect to the parameters and lattice passes beforehand.
+ * @param steps (unsigned long): Number of steps taken before checking for histogram flatness.
+ * @param run (int): Should be passed 0, if only doing one run. Used to keep track of how many times 
+ * the algorithm has run in a given script.
+ * @param verbose (bool): If true, output information about the simulation each iteration.
+ */
 void WL::simulate(unsigned long long steps, int run, bool verbose) {
     if (!(this->added_lattice && this->added_params && this->added_rng)) {
         printf(" -- Error: forgot to add the simulation parameters, rng or lattice -- ");
