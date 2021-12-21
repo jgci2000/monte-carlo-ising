@@ -1,3 +1,7 @@
+/**
+ * Implementation by João Inácio (j.g.c.inacio@fys.uio.no).
+ * Dec. 2021
+ */
 
 #include "fss.h"
 
@@ -43,8 +47,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
         {
             hist2[i] = 0;
         }
-
-        // Random config at q
 
         for (int i = 0; i < this->ising_lattice->N_atm; ++i)
             this->ising_lattice->spins_vector[i] = this->ising_lattice->spins_values[0];
@@ -99,12 +101,7 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
         idx_E_config = this->ising_lattice->energies[E_config];
         int idx_Npos_config = idx_Npos / this->ising_lattice->Sz;
 
-        // Update hist22ograms
-
         hist2[idx_E_config * this->ising_lattice->line_size_Npos.at(q) + idx_Npos_config]++;
-
-        // Scan the first config
-        // printf("HERE_before! \n");
 
         for (int x = 1; x < this->ising_lattice->Sz; ++x)
         {
@@ -112,10 +109,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             for (int i = 0; i < this->ising_lattice->N_atm; ++i)
                 if (SPM[i] + 1 <= this->ising_lattice->Sz - x)
                     flip_list.push_back(i);
-
-            // for (int i = 0; i < flip_list.size(); ++i)
-            //     printf("%d ", flip_list.at(i));
-            // printf("\n");
 
             for (int flip_idx = 0; flip_idx < flip_list.size(); ++flip_idx)
             {
@@ -159,24 +152,12 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             }
         }
 
-        // for (int i = 0; i < 3; ++i) {
-        //     for (int j = 0; j < this->ising_lattice->line_size_Npos.at(i) * this->ising_lattice->NE; ++j) {
-        //         printf("%f ", this->JDOS_M_spin[i][j]);
-        //     }
-        //     printf("\n");
-        // }
-
-
         long long k = 1;
         bool accepted = false;
         std::vector<int> new_SPM;
 
-        // Where the magic happens
-
         while (min_hist2(hist2, this->ising_lattice->NE * this->ising_lattice->line_size_Npos.at(q)) < this->REP)
         {
-            // Get a new random condig at magnetization q
-            // printf("HERE! \n");
             if (!accepted)
             {
                 new_SPM = SPM;
@@ -186,8 +167,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             int new_E_config = 0;
             int new_idx_E_config = 0;
             int new_idx_Npos_config = 0;
-
-            // Choose a spin to flip
 
             int flipped_idx1 = this->rng->rand() % this->ising_lattice->N_atm;
 
@@ -212,8 +191,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             new_E_config = E_config - E_old + E_new;
 
             int SPM_dif = SPM_end - SPM_start;
-
-            // Choose another one to flip back
 
             std::vector<int> flip_list;
             for (int i = 0; i < this->ising_lattice->N_atm; ++i)
@@ -257,8 +234,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             new_idx_Npos_config = idx_Npos / this->ising_lattice->Sz;
             new_idx_E_config = this->ising_lattice->energies[new_E_config];
 
-            // Wang Landau criteria
-
             long double ratio = this->JDOS_M_spin[q][idx_Npos_config * this->ising_lattice->NE + idx_E_config] / this->JDOS_M_spin[q][new_idx_Npos_config * this->ising_lattice->NE + new_idx_E_config];
 
             if (ratio >= 1 || this->rng->rand_uniform() < ratio || hist2[new_idx_E_config * this->ising_lattice->line_size_Npos.at(q) + new_idx_Npos_config] == 0)
@@ -277,9 +252,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             {
                 accepted = false;
             }
-            // printf("HERE 2! \n");
-
-            // Scan configuration
 
             if (hist2[idx_E_config * this->ising_lattice->line_size_Npos.at(q) + idx_Npos_config] < this->REP && k % this->skip == 0 || hist2[idx_E_config * this->ising_lattice->line_size_Npos.at(q) + idx_Npos_config] == 0)
             {
@@ -338,8 +310,6 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
             k++;
         }
         
-        // Normalize JDOS and output to console
-
         std::vector<long double> sum_JDOS_M_spin; sum_JDOS_M_spin.assign(this->ising_lattice->NE, 0);
         long double sum_sum_JDOS_M_spin = 0;
         for (int i = 0; i < this->ising_lattice->NE; ++i)
@@ -388,13 +358,11 @@ void FSS::simulate_Sz_S(int run, bool verbose) {
                 q_time / hits);
         }
 
+        this->time_iter[q - 1] = q_time;
+        this->steps_iter[q - 1] = k;
+
         delete[] hist2;
     }
-
-    // {
-    //     this->time_iter[q - 1] = q_time;
-    //     this->steps_iter[q - 1] = k;
-    // }
 
     auto runtime_end = std::chrono::steady_clock::now();
     this->run_time = (double) (std::chrono::duration_cast<std::chrono::microseconds> (runtime_end - runtime_start).count()) * pow(10, -6);
@@ -462,8 +430,6 @@ void FSS::first_step_Sz_S(std::vector<int> &SPM) {
     for (int i = 0; i < this->ising_lattice->NE; i++)
         this->ising_lattice->JDOS[i * this->ising_lattice->NM + 1] = sum_JDOS_M_spin[i] * exp(this->ising_lattice->norm_factor[1]) / sum_sum_JDOS_M_spin;
 }
-
-
 
 long double average_hist22(long long *hist2, int size)
 {
