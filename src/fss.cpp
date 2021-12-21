@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdint.h>
+#include <filesystem>
 
 /**
  * Flat Scan Sampling class. 
@@ -377,10 +378,18 @@ void FSS::spin_flip(int *new_spins_vector, int &new_E_config, int &new_idx_E_con
     new_idx_E_config = this->ising_lattice->energies[new_E_config];
 }
 
-void FSS::write_to_file(std::string name, bool debug) {
-    int status = system("mkdir results");
+/**
+ * Writes estimated Joint Density of States to file.
+ * @param name (string): Name of the file without extension.
+ * @param path (string): Path of the directory where the file should be written to. 
+ * Relative path from the execution directory, of the form "folder1/folder2/.../".
+ * @param debug (bool): If true outputs additional information about the simulation.
+ * First column is the number of steps and second is the time taken.
+ */
+void FSS::write_to_file(std::string name, std::string path, bool debug) {
+    std::filesystem::create_directories(path); 
 
-    std::ofstream file1("results/" + name);
+    std::ofstream file1(path + name);
     if (file1.is_open()) {
         for (int i = 0; i < this->ising_lattice->NE; ++i) 
         {
@@ -395,9 +404,9 @@ void FSS::write_to_file(std::string name, bool debug) {
     }
 
     if (debug) {
-        int status = system("mkdir results/debug");
+        std::filesystem::create_directories(path + "debug/"); 
 
-        std::ofstream file2("results/debug/" + name);
+        std::ofstream file2(path + "debug/" + name);
         if (file2.is_open()) {
             file2 << this->run_time << "\n";
             for (int i = 0; i < this->idx_M_max; i++) {
@@ -410,6 +419,9 @@ void FSS::write_to_file(std::string name, bool debug) {
     }
 }
 
+/**
+ * Prints the estimated Joint Density of States to the terminal.
+ */
 void FSS::print_JDOS() {
     printf("\nJDOS: \n");
     for (int i = 0; i < this->ising_lattice->NE; ++i) 

@@ -78,7 +78,7 @@ class FSS {
         void set_params(long long REP, int skip);
         void simulate(int run=0, bool verbose=false);
 
-        void write_to_file(std::string name, bool debug=true);
+        void write_to_file(std::string name, std::string path, bool debug=true);
         void print_JDOS();
 };
 

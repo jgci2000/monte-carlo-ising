@@ -271,11 +271,19 @@ void WL::simulate(unsigned long long steps, int run, bool verbose) {
     delete[] is_at;
 }
 
-void WL::write_to_file(std::string name, std::string dir, bool debug) {
-    std::string command = "mkdir " + dir;
-    int status = system(command.c_str());
 
-    std::ofstream file1(dir + "/" + name);
+/**
+ * Writes estimated Joint Density of States to file.
+ * @param name (string): Name of the file without extension.
+ * @param path (string): Path of the directory where the file should be written to. 
+ * Relative path from the execution directory, of the form "folder1/folder2/.../".
+ * @param debug (bool): If true outputs additional information about the simulation.
+ * First column is the number of steps and second is the time taken.
+ */
+void WL::write_to_file(std::string name, std::string path, bool debug) {
+    std::filesystem::create_directories(path); 
+
+    std::ofstream file1(path + name);
     if (file1.is_open()) {
         for (int i = 0; i < this->ising_lattice->NE; ++i) 
         {
@@ -290,10 +298,9 @@ void WL::write_to_file(std::string name, std::string dir, bool debug) {
     }
 
     if (debug) {
-        command += "/debug";
-        int status = system(command.c_str());
+        std::filesystem::create_directories(path + "debug/"); 
 
-        std::ofstream file2("results/debug/" + name);
+        std::ofstream file2(path + "debug/" + name);
         if (file2.is_open()) {
             file2 << this->run_time << "\n";
             for (int i = 0; i < this->n_f_vals; i++) {
@@ -306,6 +313,9 @@ void WL::write_to_file(std::string name, std::string dir, bool debug) {
     }
 }
 
+/**
+ * Prints the estimated Joint Density of States to the terminal.
+ */
 void WL::print_JDOS() {
     printf("\nJDOS: \n");
     for (int i = 0; i < this->ising_lattice->NE; ++i) 
