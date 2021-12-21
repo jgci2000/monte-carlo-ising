@@ -380,7 +380,7 @@ void FSS::spin_flip(int *new_spins_vector, int &new_E_config, int &new_idx_E_con
 
 /**
  * Writes estimated Joint Density of States to file.
- * @param name (string): Name of the file without extension.
+ * @param name (string): Name of the file with extension.
  * @param path (string): Path of the directory where the file should be written to. 
  * Relative path from the execution directory, of the form "folder1/folder2/.../".
  * @param debug (bool): If true outputs additional information about the simulation.
