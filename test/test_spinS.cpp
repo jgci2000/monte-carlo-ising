@@ -19,15 +19,16 @@ int main(int argv, char **argc) {
     // wang_landau.simulate(1000, 0, true);
     // wang_landau.print_JDOS();
     
-    System ising(4, 2, "SS", "../");
+    System ising(3, 3, "SS", "../");
 
     long long REP = 1000;
     int skip = 1;
     FSS fss(REP, skip, rng, ising);
 
-    fss.simulate(0, true);
-    fss.print_JDOS();
-    
+    fss.simulate(0, false);
+    fss.write_to_file("JDOS", true);
+
+    printf("run time %f", fss.run_time);
 
     return 0;
 }

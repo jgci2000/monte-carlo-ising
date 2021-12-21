@@ -12,8 +12,7 @@ int main(int argv, char **argc) {
     FSS fss(1000, 1, rng, ising_lattice);
 
     fss.simulate(0, true);
-    fss.print_JDOS();
-    fss.write_to_file("JDOS.txt");
+    fss.write_to_file("JDOS.txt", "./", true);
     
     return 0;
 }
