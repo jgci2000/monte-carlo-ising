@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
         long long REP = pow(10, REP_exp);
         
         for (int skip_exp = -2; skip_exp <= 2; skip_exp++) {
-            int skip = pow(2, skip_exp);
+            int skip = L * L * pow(2, skip_exp);
 
             #pragma omp parallel for
             for (int run = 1; run <= run_max; run++) {
