@@ -146,7 +146,7 @@ void FSS::simulate(int run, bool verbose) {
             this->ising_lattice->N_atm,
             this->ising_lattice->lattice.c_str(), 
             this->ising_lattice->NN);
-        printf("    Simulation Parameters: REP: %ld | skip: %d \n",
+        printf("    Simulation Parameters: REP: %lld | skip: %d \n",
             this->REP, 
             this->skip);   
         printf("\n");
