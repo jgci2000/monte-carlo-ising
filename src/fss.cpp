@@ -227,10 +227,10 @@ void FSS::simulate_Sz_2(int run, bool verbose) {
                 this->flip_list[1].push_back(flipped_idx2);
             }
 
-            this->hist[idx_E_config]++;
-
-            if (this->hist[idx_E_config] < this->REP && k % this->skip == 0 || this->hist[idx_E_config] == 0)
+            if (this->hist[idx_E_config] < this->REP && k % this->skip == 0 || this->hist[idx_E_config] == 0) {
+                this->hist[idx_E_config]++;
                 this->scan(q, idx_E_config);
+            }
 
             k++;
         }
