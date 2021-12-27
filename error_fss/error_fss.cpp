@@ -14,14 +14,14 @@ int main(int argc, char** argv) {
     run_max = atoi(argv[1]);
     L = atoi(argv[2]);
     exp_REP_final = atoi(argv[3]);
-
+    
+    #pragma omp parallel for
     for (int REP_exp = 2; REP_exp <= exp_REP_final; REP_exp++) {
         long long REP = pow(10, REP_exp);
         
         for (int skip_exp = -2; skip_exp <= 2; skip_exp++) {
             int skip = L * L * pow(2, skip_exp);
 
-            #pragma omp parallel for
             for (int run = 1; run <= run_max; run++) {
                 std::string path = "data/REP_" + std::to_string(REP_exp) + "/skip_" + std::to_string(skip_exp) + "/";
                 std::string name = std::to_string(run) + "_JDOS.txt";
