@@ -26,7 +26,7 @@ int main(int argv, char **argc) {
     FSS fss(REP, skip, rng, ising);
 
     fss.simulate(0, false);
-    fss.write_to_file("JDOS", true);
+    fss.write_to_file("JDOS", "./", true);
 
     printf("run time %f", fss.run_time);
 
