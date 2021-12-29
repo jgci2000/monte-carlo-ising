@@ -6,6 +6,9 @@
 .DS_Store
 */.DS_Store
 
+*.vsz
+*.csv
+
 # Prerequisites
 *.d
 
