@@ -8,6 +8,7 @@
 
 *.vsz
 *.csv
+*.eps
 
 # Prerequisites
 *.d
