@@ -33,18 +33,31 @@ for S = [1/2, 1, 3/2, 2]
 
     JDOS = log(JDOS);
     z_label = "log(JDOS)";
+    
+    max_JDOS = max(max(JDOS));
+    JDOS = JDOS / max_JDOS;
 
     % code for top view
     figure(1)
-    set(gcf,'position',[0, 0, 1750, 500])
+    set(gcf,'position',[0, 0, 10000, 4000])
+    %fig = gcf;
+    %fig.PaperUnits = 'centimeters';
+    %fig.PaperPosition = [0 0 12 18];
     subplot(1, 4, plot_idx);
 
     b = bar3(JDOS);
     zlabel('JDOS')
     view(0, 90)
-    axis('equal')
-    title(title_plot(plot_idx))
+    %axis([-1 1 -1 1])
+    axis square
+    xlim([0 max_M + 2])
+    ylim([0 max_E * 0.575])
     
+    %set(gca, 'Position', [-0.1,0.1,1.2,0.85])
+    %set(gcf, 'OuterPosition', [0,0,1,1])
+    
+    title(title_plot(plot_idx))
+       
     xticks([1 ((length(M_list)-1)/4 + 1) ((length(M_list)-1)/2+1) (3*(length(M_list)-1)/4+1) length(M_list)])
     yticks([1 ((length(E_list)-1)/4 + 1) ((length(E_list)-1)/2+1) (3*(length(E_list)-1)/4+1) length(E_list)])
     %
@@ -56,9 +69,9 @@ for S = [1/2, 1, 3/2, 2]
     %
     xt = get(gca, 'XTick');
     yt = get(gca, 'YTick');
-    set(gca, 'XTickLabel', linspace(M_list(min(xt)), M_list(max(xt)), numel(xt)))
+    set(gca, 'XTickLabel', linspace(M_list(min(xt))/max_M, M_list(max(xt))/max_M, numel(xt)))
     xlabel('M')
-    set(gca, 'YTickLabel', linspace(E_list(min(yt)), E_list(max(yt)), numel(yt)))
+    set(gca, 'YTickLabel', linspace(E_list(min(yt))/max_E, E_list(max(yt))/max_E, numel(yt)))
     ylabel('E')
     %
     h = get(gca,'children');
