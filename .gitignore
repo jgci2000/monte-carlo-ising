@@ -5,6 +5,8 @@
 *.o
 .DS_Store
 */.DS_Store
+*.pdf
+*.asv
 
 *.vsz
 *.csv
