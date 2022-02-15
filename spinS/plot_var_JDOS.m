@@ -31,12 +31,13 @@ for S = [1/2, 1, 3/2, 2]
     JDOS(:,index_M0+1:length(M_list)) = JDOS(:,index_M0-1:-1:1);
     z_label = "JDOS";
 
-    JDOS = log(JDOS);
+    JDOS(JDOS ~= 1) = log(JDOS(JDOS ~= 1));
+    JDOS(JDOS == 1) = 0.1;
     z_label = "log(JDOS)";
     
     max_JDOS = max(max(JDOS));
-    JDOS = JDOS / max_JDOS;
-
+    % JDOS = JDOS / max_JDOS;
+    
     % code for top view
     figure(1)
     set(gcf,'position',[0, 0, 10000, 4000])
