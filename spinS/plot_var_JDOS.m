@@ -105,7 +105,10 @@ for S = [1/2, 1, 3/2, 2]
     cbh = colorbar;
     cbh.Label.String = z_label;
     set(gca,'Fontsize',15)
+    
+    disp("size=" + size(JDOS) + "; numel= " + numel(JDOS) + "; nnzero; " + numel(JDOS(JDOS ~= -inf)))
+    
 end
 
-exportgraphics(gcf, "spinS/" + save_name + ".eps", 'Resolution', 200)
+% exportgraphics(gcf, "spinS/" + save_name + ".eps", 'Resolution', 200)
 
