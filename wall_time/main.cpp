@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     int L = atoi(argv[1]); 
     int N_atm = L * L;
     long REP = 10000;
-    int skip = N_atm / 4;
+    int skip = N_atm;
 
     std::string path = "data/";
     std::string name = "JDOS_L" + std::to_string(L) + "_SS_Sz2_R1E4_skip" + std::to_string(skip) + ".txt";
