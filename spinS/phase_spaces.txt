@@ -17,3 +17,24 @@ L = 4
         16705 points
         4162 non zero points
 
+L = 8
+
+    S = 1/2:
+        (65 x 65)
+        4225 points
+        1642 non zero points
+    
+    S = 1:
+        (257 x 129)
+        33153 points
+        12749 non zero points
+
+    S = 3/2:
+        (577 x 193)
+        111361 points
+        42820 non zero points
+
+    S = 2:
+        (1025 x 257)
+        263425 points
+        101364 non zero points
