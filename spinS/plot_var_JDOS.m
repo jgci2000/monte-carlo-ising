@@ -5,7 +5,7 @@ close
 % Script to visualize the JDoS of an Ising system
 % 17th Jan 2022
 
-save_name = "JDOS_L4_SS";
+save_name = "JDOS_L8_SS";
 plot_idx = 0;
 title_plot = ["(a) S=1/2", "(b) S=1", "(c) S=3/2", "(d) S=2"];
 
@@ -13,7 +13,7 @@ for S = [1/2, 1, 3/2, 2]
     plot_idx = plot_idx + 1;
     
     rep_exp = 4;
-    L = 4;
+    L = 8;
     Sz = uint8(2 * S + 1);
     N_atm = L * L;
     lattice = "SS";
@@ -25,14 +25,15 @@ for S = [1/2, 1, 3/2, 2]
     E_list = - max_E:4:max_E;
     M_list = - max_M:2:max_M;
 
-    file_name = "JDOS_L" + int2str(L) + "_" + lattice + "_Sz_" + int2str(Sz) + "_R1E" + int2str(rep_exp);
-    JDOS = importdata("spinS/data/" + file_name + ".txt");
+    % file_name = "JDOS_L" + int2str(L) + "_" + lattice + "_Sz_" + int2str(Sz) + "_R1E" + int2str(rep_exp);
+    file_name = "JDOS_FSS_spinS_Ising_v5_Npos" + int2str(Sz) + "_2D_SS_L8_REP_1E2_skip_100";
+    JDOS = importdata("spinS/data/" + file_name + ".mat").JDOS_nRPS;
     index_M0 = (length(M_list)-1)/2 + 1;
     JDOS(:,index_M0+1:length(M_list)) = JDOS(:,index_M0-1:-1:1);
     z_label = "JDOS";
 
     JDOS(JDOS ~= 1) = log(JDOS(JDOS ~= 1));
-    JDOS(JDOS == 1) = 0.1;
+    JDOS(JDOS == 1) = 0.01;
     z_label = "log(JDOS)";
     
     max_JDOS = max(max(JDOS));
@@ -110,5 +111,5 @@ for S = [1/2, 1, 3/2, 2]
     
 end
 
-% exportgraphics(gcf, "spinS/" + save_name + ".eps", 'Resolution', 200)
+exportgraphics(gcf, "spinS/" + save_name + ".eps", 'Resolution', 200)
 
