@@ -1,5 +1,7 @@
 # Monte-Carlo Methods for the Ising model
 
+Here you can find all of the codes and results used in the paper titled *Accurate Estimate of the Joint Density of States via Flat Scan Sampling* with the reference arXiv:submit/4195427 [cond-mat.stat-mech] 5 Mar 2022.
+
 Any questions contact: <j.g.c.inacio@fys.uio.no>
 
 ## Suported Models:
@@ -61,5 +63,6 @@ int main(int argv, char **argc) {
 ```
 The `WL` class takes as parameters the value of the first and last modification factors, the flatness criteria and an instance of `RNG` and `System`. 
 
+For spinS computations, it it better to use the MATLAB implementation by J. Amaral <jamaral@ua.pt>. A more efficient C++ implementation will come in the near future.
 		
 
