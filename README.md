@@ -1,6 +1,6 @@
 # Monte-Carlo Methods for the Ising model
 
-Here you can find all of the codes and results used in the paper titled *Accurate Estimate of the Joint Density of States via Flat Scan Sampling* with the reference arXiv:submit/4195427 [cond-mat.stat-mech] 5 Mar 2022.
+Here you can find all of the codes and results used in the paper titled [Accurate Estimate of the Joint Density of States via Flat Scan Sampling](https://arxiv.org/abs/2203.02718), arXiv:2203.02718 [cond-mat.stat-mech].
 
 Any questions contact: <j.g.c.inacio@fys.uio.no>
 
